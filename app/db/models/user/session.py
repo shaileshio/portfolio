@@ -24,7 +24,6 @@ class UserSession(Base, name="user_sessions"):
             column="users.id",
             ondelete="SET NULL",
         ),
-        unique=True,
         index=True,
     )
 
