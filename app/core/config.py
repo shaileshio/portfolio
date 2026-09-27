@@ -1,11 +1,12 @@
 from functools import lru_cache
 
+from cryptography.fernet import Fernet
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AppConfig(BaseModel):
-    title: str = "portfolio builder"
+    title: str = "Portfolio Builder"
     description: str = "Production-grade AI-powered engineering portfolio builder"
     debug: bool = True
 
@@ -22,6 +23,13 @@ class DatabaseConfig(BaseModel):
     test_url: str | None = None
 
 
+class TokenConfig(BaseSettings):
+    secret_key: str = Fernet.generate_key().decode()
+    algorithm: str = "HS256"
+    access_expire_minutes: int = 30
+    refresh_expire_minutes: int = 60 * 7
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -34,6 +42,7 @@ class Settings(BaseSettings):
     app: AppConfig = Field(default_factory=AppConfig)
     cors: CorsConfig = Field(default_factory=CorsConfig)
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
+    token: TokenConfig = Field(default_factory=TokenConfig)
 
 
 @lru_cache

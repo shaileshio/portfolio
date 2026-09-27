@@ -8,9 +8,11 @@ dependencies = [
     "alembic>=1.20.0",
     "argon2-cffi>=25.1.0",
     "asyncpg>=0.31.0",
+    "cryptography>=50.0.1",
     "fastapi-swagger-ui-theme>=0.1.0",
     "fastapi[standard]>=0.141.1",
     "pydantic-settings>=2.15.0",
+    "python-jose[cryptography]>=3.5.0",
     "sqlalchemy>=2.0.52",
     "uuid6>=2025.0.1",
     "uvicorn[standard]>=0.52.4",
@@ -28,6 +30,7 @@ dev = [
     "pytest-asyncio>=1.4.0",
     "pytest-cov>=7.1.0",
     "pytest-faker>=2.0.0",
+    "types-python-jose>=3.5.0.20260408",
 ]
 
 # =============================================================================

@@ -1,0 +1,37 @@
+from collections.abc import Mapping
+from datetime import timedelta
+from typing import Any
+
+from app.core.config import get_settings
+
+from .enum import TokenType
+from .factory import create_token
+from .verifier import TokenVerifier
+
+settings = get_settings()
+
+
+class TokenManager:
+    def __init__(self, verifier: TokenVerifier) -> None:
+        self.secret_key = settings.token.secret_key
+        self.algorithm = settings.token.algorithm
+        self.verifier = verifier
+
+    def create(
+        self, type: TokenType, claims: Mapping[str, Any], expire_minutes: int
+    ) -> str:
+        return create_token(
+            claims=claims,
+            subject=type.value,
+            secret_key=self.secret_key,
+            algorithm=self.algorithm,
+            expires_in=timedelta(minutes=expire_minutes),
+        )
+
+    def verify(self, token: str, type: TokenType) -> dict[str, Any]:
+        return self.verifier.verify_token(
+            token=token,
+            expected_sub=type.value,
+            secret_key=self.secret_key,
+            algorithm=self.algorithm,
+        )
