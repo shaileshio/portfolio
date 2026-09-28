@@ -10,7 +10,12 @@ from .schemas import LoginRequest, LogoutRequest, RegisterRequest, RegisterRespo
 router = APIRouter(prefix="/auth", tags=["Authencation"])
 
 
-@router.post("/register", response_model=RegisterResponse)
+@router.post(
+    "/register",
+    summary="Create a new user account",
+    description="Register a new user account for authentication.",
+    response_model=RegisterResponse,
+)
 async def register(data: RegisterRequest, service: AuthServiceDep) -> User:
     return await service.create_active_user(data)
 
@@ -24,5 +29,9 @@ async def login(data: LoginRequest, service: AuthServiceDep) -> TokenResponse:
     return await service.create_jwt_tokens(data)
 
 
-@router.post("/logout")
+@router.post(
+    "/logout",
+    summary="Log out of the current session",
+    description="Log out by invalidating the current authentication session.",
+)
 async def logout(data: LogoutRequest, session: AsyncSessionDep): ...
