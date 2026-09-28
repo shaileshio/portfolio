@@ -1,5 +1,7 @@
 from typing import Any
 
+from pydantic import BaseModel as Model
+from pydantic import ConfigDict
 from sqlalchemy import MetaData
 from sqlalchemy.orm import DeclarativeBase
 
@@ -24,3 +26,9 @@ class Base(DeclarativeBase):
         cls.__tablename__ = name
 
         super().__init_subclass__(**kwargs)
+
+
+class BaseModel(Model):
+    model_config = ConfigDict(
+        from_attributes=True,
+    )

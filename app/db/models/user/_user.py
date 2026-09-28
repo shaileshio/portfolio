@@ -21,8 +21,9 @@ class User(Base, name="users"):
         index=True,
     )
 
-    password_hash: Mapped[str | None] = mapped_column(
+    password_hash: Mapped[str] = mapped_column(
         String(length=255),
+        nullable=False,
     )
 
     is_active: Mapped[bool] = mapped_column(

@@ -4,12 +4,13 @@ from fastapi import Depends
 
 from app.db.depends import AsyncSessionDep
 from app.db.repositories.user import UserRepository
+from app.db.repositories.user_session import UserSessionRepository
 
-from .service import UserService
-
-
-def get_user_service(session: AsyncSessionDep) -> UserService:
-    return UserService(UserRepository(session))
+from .service import AuthService
 
 
-type UserServiceDep = Annotated[UserService, Depends(get_user_service)]
+def get_auth_service(session: AsyncSessionDep) -> AuthService:
+    return AuthService(UserRepository(session), UserSessionRepository(session))
+
+
+type AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]

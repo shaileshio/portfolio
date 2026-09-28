@@ -1,15 +1,15 @@
 from collections.abc import Mapping
 from datetime import UTC, datetime, timedelta
 from typing import Any
-from uuid import uuid4
 
 from jose import jwt
+from uuid6 import uuid6
 
 
 def create_token(
     *,
-    claims: Mapping[str, Any],
     subject: str,
+    claims: Mapping[str, Any],
     secret_key: str,
     algorithm: str,
     expires_in: timedelta,
@@ -19,7 +19,7 @@ def create_token(
     payload: dict[str, Any] = {
         **claims,
         "sub": subject,
-        "jti": str(uuid4()),
+        "jti": str(uuid6()),
         "iat": utc_now,
         "exp": utc_now + expires_in,
     }

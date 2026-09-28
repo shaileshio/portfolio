@@ -1,3 +1,5 @@
+from fastapi import status
+
 from app.core.exceptions import BadRequestError, ConflictError, NotFoundError
 
 
@@ -7,7 +9,7 @@ class ConfirmPasswordNotMatchError(BadRequestError):
         detail: str = "Password it not meatch to confirm password",
         *,
         code: str = "confirm_password_not_match",
-        status: int = 400,
+        status: int = status.HTTP_400_BAD_REQUEST,
     ) -> None:
         super().__init__(detail, code=code, status=status)
 
@@ -19,6 +21,17 @@ class UserNotFoundError(NotFoundError):
         *,
         code: str = "user_not_found",
         status: int = 404,
+    ) -> None:
+        super().__init__(detail, code=code, status=status)
+
+
+class InvalidPasswordError(NotFoundError):
+    def __init__(
+        self,
+        detail: str = "Invalid password",
+        *,
+        code: str = "invalid_password",
+        status: int = status.HTTP_400_BAD_REQUEST,
     ) -> None:
         super().__init__(detail, code=code, status=status)
 

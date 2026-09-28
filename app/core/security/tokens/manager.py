@@ -4,7 +4,6 @@ from typing import Any
 
 from app.core.config import get_settings
 
-from .enum import TokenType
 from .factory import create_token
 from .verifier import TokenVerifier
 
@@ -18,20 +17,20 @@ class TokenManager:
         self.verifier = verifier
 
     def create(
-        self, type: TokenType, claims: Mapping[str, Any], expire_minutes: int
+        self, *, subject: str, expire_minutes: int, claims: Mapping[str, Any]
     ) -> str:
         return create_token(
+            subject=subject,
             claims=claims,
-            subject=type.value,
             secret_key=self.secret_key,
             algorithm=self.algorithm,
             expires_in=timedelta(minutes=expire_minutes),
         )
 
-    def verify(self, token: str, type: TokenType) -> dict[str, Any]:
+    def verify(self, *, token: str, subject: str) -> dict[str, Any]:
         return self.verifier.verify_token(
             token=token,
-            expected_sub=type.value,
+            subject=subject,
             secret_key=self.secret_key,
             algorithm=self.algorithm,
         )

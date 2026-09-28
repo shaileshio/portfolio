@@ -11,7 +11,7 @@ logger = getLogger(__name__)
 
 class TokenVerifier:
     def verify_token(
-        self, *, token: str, expected_sub: str, secret_key: str, algorithm: str
+        self, *, token: str, subject: str, secret_key: str, algorithm: str
     ) -> dict[str, Any]:
         try:
             claims = jwt.decode(
@@ -27,11 +27,11 @@ class TokenVerifier:
             logger.debug("Invalid Jwt", exc_info=exc)
             raise InvalidTokenError
 
-        self._validate(claims, expected_sub)
+        self._validate(subject, claims)
         return claims
 
     @staticmethod
-    def _validate(claims: dict[str, Any], expected_sub: str) -> None:
+    def _validate(subject: str, claims: dict[str, Any]) -> None:
         required = {"sub", "exp", "iat", "jti"}
-        if not required.issubset(claims) and claims["sub"] != expected_sub:
+        if not required.issubset(claims) and claims["sub"] != subject:
             raise InvalidTokenError

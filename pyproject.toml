@@ -84,10 +84,9 @@ asyncio_mode = "auto"
 pythonpath = ["."]
 filterwarnings = ["error"]
 markers = [
-    "unit: Unit tests",
-    "integration: Integration tests",
-    "e2e: End-to-end tests",
-    "slow: Slow tests",
+    "unit: Unit tests that test isolated components",
+    "integration: Integration tests that interact with external components",
+    "slow: Tests that take longer to execute",
 ]
 
 # =============================================================================

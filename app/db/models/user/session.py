@@ -34,7 +34,7 @@ class UserSession(Base, name="user_sessions"):
     )
 
     refresh_token_hash: Mapped[str] = mapped_column(
-        String(64),
+        String(255),
         nullable=False,
         unique=True,
     )

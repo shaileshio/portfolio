@@ -20,3 +20,12 @@ class UserRepository:
         await self.session.refresh(user)
 
         return user
+
+    async def get_by_email(self, email: str) -> User | None:
+        stmt = select(User).where(
+            User.email == email,
+            User.is_active == True,
+        )
+
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
