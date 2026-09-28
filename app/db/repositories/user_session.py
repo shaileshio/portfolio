@@ -40,9 +40,7 @@ class UserSessionRepository:
         )
 
         self.session.add(user_session)
-
         await self.session.flush()
-        await self.session.refresh(user_session)
 
         return user_session
 

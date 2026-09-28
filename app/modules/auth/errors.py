@@ -6,7 +6,7 @@ from app.core.exceptions import BadRequestError, ConflictError, NotFoundError
 class ConfirmPasswordNotMatchError(BadRequestError):
     def __init__(
         self,
-        detail: str = "Password it not meatch to confirm password",
+        detail: str = "Confirm password doesn't match",
         *,
         code: str = "confirm_password_not_match",
         status: int = status.HTTP_400_BAD_REQUEST,

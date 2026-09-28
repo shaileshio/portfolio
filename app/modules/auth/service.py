@@ -24,32 +24,37 @@ settings = get_settings()
 class AuthService:
     def __init__(
         self,
-        user_repository: UserRepository,
-        user_session_repository: UserSessionRepository,
+        user_repo: UserRepository,
+        user_session_repo: UserSessionRepository,
     ) -> None:
-        self.user_repository = user_repository
-        self.user_session_repository = user_session_repository
-        self.hasher = get_hasher()
+        self._user_repo = user_repo
+        self._user_session_repo = user_session_repo
+        self._hasher = get_hasher()
         self.token_manager = get_token_manager()
 
     async def create_active_user(self, data: RegisterRequest) -> User:
         if data.password != data.confirm_password:
             raise ConfirmPasswordNotMatchError
 
-        if await self.user_repository.email_exists(data.email):
+        if await self._user_repo.email_exists(data.email):
             raise EmailAlreadyExistError
 
-        return await self.user_repository.create(
-            data.email, self.hasher.hash(data.password)
+        user = await self._user_repo.create(
+            data.email, self._hasher.hash(data.password)
         )
 
+        await self._user_repo.session.commit()
+        await self._user_repo.session.refresh(user)
+
+        return user
+
     async def create_jwt_tokens(self, data: LoginRequest) -> TokenResponse:
-        user = await self.user_repository.get_by_email(data.email)
+        user = await self._user_repo.get_by_email(data.email)
 
         if user is None:
             raise UserNotFoundError
 
-        if not self.hasher.verify(data.password, user.password_hash):
+        if not self._hasher.verify(data.password, user.password_hash):
             raise InvalidPasswordError
 
         access = self.token_manager.create(
@@ -63,13 +68,13 @@ class AuthService:
             claims={"type": TokenType.REFRESH.value},
         )
 
-        await self.user_session_repository.create(
+        await self._user_session_repo.create(
             user_id=user.id,
             token_family_id=uuid7(),
-            refresh_token_hash=self.hasher.hash(refresh),
+            refresh_token_hash=self._hasher.hash(refresh),
             expires_at=datetime.now(UTC)
             + timedelta(minutes=settings.token.refresh_expire_minutes),
         )
-        await self.user_session_repository.session.commit()
+        await self._user_session_repo.session.commit()
 
         return TokenResponse(access_token=access, refresh_token=refresh)
