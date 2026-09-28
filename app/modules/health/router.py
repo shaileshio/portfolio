@@ -9,13 +9,19 @@ from .schemas import HealthReadyErrorResponse, HealthReadyResponse, HealthRespon
 router = APIRouter(prefix="/health", tags=["Health"])
 
 
-@router.get("/")
+@router.get(
+    "/",
+    summary="Check API health",
+    description="Returns the current health status of the API.",
+)
 async def health() -> HealthResponse:
     return HealthResponse(status="ok")
 
 
 @router.get(
     "/ready",
+    summary="Check API readiness",
+    description="Checks whether the API and its database are ready to serve requests.",
     responses={503: {"model": HealthReadyErrorResponse}},
 )
 async def ready(session: AsyncSessionDep) -> HealthReadyResponse:
