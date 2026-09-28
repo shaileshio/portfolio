@@ -10,7 +10,7 @@ from .service import AuthService
 
 
 def get_auth_service(session: AsyncSessionDep) -> AuthService:
-    return AuthService(UserRepository(session), UserSessionRepository(session))
+    return AuthService(session, UserRepository(session), UserSessionRepository(session))
 
 
 type AuthServiceDep = Annotated[AuthService, Depends(get_auth_service)]

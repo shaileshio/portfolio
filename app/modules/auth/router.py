@@ -1,4 +1,4 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
 from app.db.depends import AsyncSessionDep
 from app.db.models.user import User
@@ -25,8 +25,10 @@ async def register(data: RegisterRequest, service: AuthServiceDep) -> User:
     summary="Issue new jwt tokens",
     description="Issue new jwt tokens to make requests on protected routes.",
 )
-async def login(data: LoginRequest, service: AuthServiceDep) -> TokenResponse:
-    return await service.create_jwt_tokens(data)
+async def login(
+    request: Request, data: LoginRequest, service: AuthServiceDep
+) -> TokenResponse:
+    return await service.create_jwt_tokens(request, data)
 
 
 @router.post(

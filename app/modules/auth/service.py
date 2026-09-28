@@ -1,5 +1,7 @@
 from datetime import UTC, datetime, timedelta
 
+from fastapi import Request
+from sqlalchemy.ext.asyncio import AsyncSession
 from uuid6 import uuid7
 
 from app.core.config import get_settings
@@ -9,6 +11,7 @@ from app.core.security.tokens.provider import get_token_manager
 from app.db.models import User
 from app.db.repositories import UserRepository
 from app.db.repositories.user_session import UserSessionRepository
+from app.shared.ipaddress import get_client_ip
 
 from .errors import (
     ConfirmPasswordNotMatchError,
@@ -24,13 +27,15 @@ settings = get_settings()
 class AuthService:
     def __init__(
         self,
+        session: AsyncSession,
         user_repo: UserRepository,
         user_session_repo: UserSessionRepository,
     ) -> None:
+        self._session = session
         self._user_repo = user_repo
         self._user_session_repo = user_session_repo
         self._hasher = get_hasher()
-        self.token_manager = get_token_manager()
+        self._token_manager = get_token_manager()
 
     async def create_active_user(self, data: RegisterRequest) -> User:
         if data.password != data.confirm_password:
@@ -43,12 +48,14 @@ class AuthService:
             data.email, self._hasher.hash(data.password)
         )
 
-        await self._user_repo.session.commit()
-        await self._user_repo.session.refresh(user)
+        await self._session.commit()
+        await self._session.refresh(user)
 
         return user
 
-    async def create_jwt_tokens(self, data: LoginRequest) -> TokenResponse:
+    async def create_jwt_tokens(
+        self, request: Request, data: LoginRequest
+    ) -> TokenResponse:
         user = await self._user_repo.get_by_email(data.email)
 
         if user is None:
@@ -57,12 +64,12 @@ class AuthService:
         if not self._hasher.verify(data.password, user.password_hash):
             raise InvalidPasswordError
 
-        access = self.token_manager.create(
+        access = self._token_manager.create(
             subject=f"user:{user.id!s}",
             expire_minutes=settings.token.access_expire_minutes,
             claims={"type": TokenType.ACCESS.value},
         )
-        refresh = self.token_manager.create(
+        refresh = self._token_manager.create(
             subject=f"user:{user.id!s}",
             expire_minutes=settings.token.refresh_expire_minutes,
             claims={"type": TokenType.REFRESH.value},
@@ -74,7 +81,10 @@ class AuthService:
             refresh_token_hash=self._hasher.hash(refresh),
             expires_at=datetime.now(UTC)
             + timedelta(minutes=settings.token.refresh_expire_minutes),
+            ip_address=get_client_ip(request),
+            user_agent=request.headers.get("user-agent"),
+            device_name=request.headers.get("host"),
         )
-        await self._user_session_repo.session.commit()
+        await self._session.commit()
 
         return TokenResponse(access_token=access, refresh_token=refresh)
