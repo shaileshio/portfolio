@@ -10,11 +10,11 @@ router = APIRouter(prefix="/health", tags=["Health"])
 
 
 @router.get(
-    "/",
+    "/live",
     summary="Check API health",
     description="Returns the current health status of the API.",
 )
-async def health() -> HealthResponse:
+async def liveness() -> HealthResponse:
     return HealthResponse(status="ok")
 
 
@@ -24,7 +24,7 @@ async def health() -> HealthResponse:
     description="Checks whether the API and its database are ready to serve requests.",
     responses={503: {"model": HealthReadyErrorResponse}},
 )
-async def ready(session: AsyncSessionDep) -> HealthReadyResponse:
+async def readiness(session: AsyncSessionDep) -> HealthReadyResponse:
     try:
         await session.execute(text("SELECT 1"))
 
