@@ -31,3 +31,13 @@ async def test_login_invalid_password(user: User, async_client: AsyncClient) -> 
     )
 
     assert response.status_code == 400
+
+
+@pytest.mark.login
+async def test_login_success(user: User, async_client: AsyncClient) -> None:
+    response = await async_client.post(
+        "/auth/login",
+        json={"email": user.email, "password": "password@12345"},
+    )
+
+    assert response.status_code == 200

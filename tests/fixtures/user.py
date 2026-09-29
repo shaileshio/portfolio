@@ -11,7 +11,7 @@ from app.db.models import User
 @pytest_asyncio.fixture
 async def user(faker: Faker, async_session: AsyncSession) -> User:
     email = faker.unique.email()
-    raw_password = faker.password()
+    raw_password = "password@12345"
 
     hasher = get_hasher()
 
