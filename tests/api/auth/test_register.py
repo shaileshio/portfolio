@@ -1,56 +1,59 @@
 import pytest
+from faker import Faker
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.db.models.user import User
 
+pytestmark = [
+    pytest.mark.api,
+    pytest.mark.auth,
+]
 
-@pytest.mark.api
-@pytest.mark.auth
-async def test_register_password_missmatch(async_client: AsyncClient) -> None:
+
+@pytest.mark.register
+async def test_register_password_missmatch(
+    faker: Faker, async_client: AsyncClient
+) -> None:
+    email = faker.unique.email()
+    password = faker.password()
+
     response = await async_client.post(
         "/auth/register",
         json={
-            "email": "shailesh@gmail.com",
-            "password": "shailesh@12345",
-            "confirm_password": "shailesh@12",
+            "email": email,
+            "password": password,
+            "confirm_password": "not-equal-to-password",
         },
     )
 
     assert response.status_code == 400
 
 
-@pytest.mark.api
-@pytest.mark.auth
-async def test_register_success(async_client: AsyncClient) -> None:
+@pytest.mark.register
+async def test_register_success(faker: Faker, async_client: AsyncClient) -> None:
+    email = faker.unique.email()
+    password = faker.password()
+
     response = await async_client.post(
         "/auth/register",
         json={
-            "email": "shailesh@gmail.com",
-            "password": "shailesh@12345",
-            "confirm_password": "shailesh@12345",
+            "email": email,
+            "password": password,
+            "confirm_password": password,
         },
     )
 
     assert response.status_code == 200
 
 
-@pytest.mark.api
-@pytest.mark.auth
-async def test_register_email_exists(
-    async_client: AsyncClient, async_session: AsyncSession
-) -> None:
-    user = User(email="shailesh@gmail.com", password_hash="shailesh@12345")
-
-    async_session.add(user)
-    await async_session.flush()
-
+@pytest.mark.register
+async def test_register_email_exists(user: User, async_client: AsyncClient) -> None:
     response = await async_client.post(
         "/auth/register",
         json={
-            "email": "shailesh@gmail.com",
-            "password": "shailesh@12345",
-            "confirm_password": "shailesh@12345",
+            "email": user.email,
+            "password": "...",
+            "confirm_password": "...",
         },
     )
 

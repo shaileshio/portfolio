@@ -1,4 +1,5 @@
 import pytest
+from faker import Faker
 from httpx import AsyncClient
 
 from app.db.models.user._user import User
@@ -10,10 +11,13 @@ pytestmark = [
 
 
 @pytest.mark.login
-async def test_login_email_not_found(async_client: AsyncClient) -> None:
+async def test_login_email_not_found(faker: Faker, async_client: AsyncClient) -> None:
+    email = faker.unique.email()
+    password = faker.password()
+
     response = await async_client.post(
         "/auth/login",
-        json={"email": "random@gmail.com", "password": "random@12345"},
+        json={"email": email, "password": password},
     )
 
     assert response.status_code == 404
