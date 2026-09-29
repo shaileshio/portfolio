@@ -12,8 +12,8 @@ settings: Settings = get_settings()
 
 DATABASE_URL: str | None = settings.database.url
 
-if DATABASE_URL is None:
-    raise OSError("Database url not found.")
+if not DATABASE_URL:
+    raise RuntimeError("Database URL is not configured.")
 
 
 async_engine: AsyncEngine = create_async_engine(

@@ -68,17 +68,14 @@ profile = "black"
 # =============================================================================
 
 [tool.pytest.ini_options]
-markers = [
-    "unit: isolated unit tests with no external infrastructure",
-    "api: FastAPI HTTP/API tests",
-    "health: tests for health-check endpoints",
-    "auth: authentication and authorization tests",
-    "login: tests for login endpoints",
-    "integration: tests involving multiple real application components",
-    "e2e: end-to-end business workflow tests",
-    "slow: tests that take significantly longer to execute",
-]
 minversion = "8.0"
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+asyncio_default_test_loop_scope = "function"
+filterwarnings = ["error"]
+
 addopts = """
 --strict-markers
 --strict-config
@@ -89,10 +86,17 @@ addopts = """
 --cov-report=xml
 --no-cov-on-fail
 """
-testpaths = ["tests"]
-asyncio_mode = "auto"
-pythonpath = ["."]
-filterwarnings = ["error"]
+
+markers = [
+    "unit: isolated unit tests with no external infrastructure",
+    "api: FastAPI HTTP/API tests",
+    "health: tests for health-check endpoints",
+    "auth: authentication and authorization tests",
+    "login: tests for login endpoints",
+    "integration: tests involving multiple real application components",
+    "e2e: end-to-end business workflow tests",
+    "slow: tests that take significantly longer to execute",
+]
 
 # =============================================================================
 # Pytest Coverage Configurations.

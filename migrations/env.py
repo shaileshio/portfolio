@@ -16,8 +16,8 @@ settings: Settings = get_settings()
 
 DATABASE_URL: str | None = settings.database.url
 
-if DATABASE_URL is None:
-    raise OSError("Database url not found.")
+if not DATABASE_URL:
+    raise RuntimeError("Test database URL is not configured.")
 
 
 # this is the Alembic Config object, which provides

@@ -13,12 +13,16 @@ from app.core.config import get_settings
 from app.db.depends import get_async_session
 from app.main import app
 
+from .fixtures import *
+
 settings = get_settings()
 
 TEST_DATABASE_URL = settings.database.test_url
 
-if TEST_DATABASE_URL is None:
-    raise OSError("Test database URL not found.")
+if not TEST_DATABASE_URL:
+    raise RuntimeError("Test database URL is not configured.")
+
+type AsyncSessionGenerator = AsyncGenerator[AsyncSession]
 
 
 @pytest_asyncio.fixture
@@ -50,34 +54,25 @@ async def async_connection(
 
 
 @pytest_asyncio.fixture
-async def async_session(
-    async_connection: AsyncConnection,
-) -> AsyncGenerator[AsyncSession]:
-    session = AsyncSession(
+async def async_session(async_connection: AsyncConnection) -> AsyncSessionGenerator:
+    async with AsyncSession(
         bind=async_connection,
         expire_on_commit=False,
         join_transaction_mode="create_savepoint",
-    )
-
-    try:
+    ) as session:
         yield session
-    finally:
-        await session.close()
 
 
 @pytest_asyncio.fixture
 async def async_client(async_session: AsyncSession) -> AsyncGenerator[AsyncClient]:
-
-    async def get_async_test_session() -> AsyncGenerator[AsyncSession]:
+    async def override_get_async_session() -> AsyncSessionGenerator:
         yield async_session
 
-    app.dependency_overrides[get_async_session] = get_async_test_session
+    app.dependency_overrides[get_async_session] = override_get_async_session
 
     try:
-        transport = ASGITransport(app=app)
-
         async with AsyncClient(
-            transport=transport,
+            transport=ASGITransport(app=app),
             base_url="http://test/api/v1",
         ) as client:
             yield client
