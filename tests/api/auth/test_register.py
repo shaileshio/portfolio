@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.models.user import User
 
 
-@pytest.mark.asyncio
+@pytest.mark.api
 async def test_register_password_missmatch(async_client: AsyncClient) -> None:
     response = await async_client.post(
         "/auth/register",
@@ -19,7 +19,7 @@ async def test_register_password_missmatch(async_client: AsyncClient) -> None:
     assert response.status_code == 400
 
 
-@pytest.mark.asyncio
+@pytest.mark.api
 async def test_register_success(async_client: AsyncClient) -> None:
     response = await async_client.post(
         "/auth/register",
@@ -33,7 +33,7 @@ async def test_register_success(async_client: AsyncClient) -> None:
     assert response.status_code == 200
 
 
-@pytest.mark.asyncio
+@pytest.mark.api
 async def test_register_email_exists(
     async_client: AsyncClient, async_session: AsyncSession
 ) -> None:
