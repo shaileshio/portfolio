@@ -16,7 +16,7 @@ async def test_login_email_not_found(faker: Faker, async_client: AsyncClient) ->
     password = faker.password()
 
     response = await async_client.post(
-        "/auth/login",
+        "/api/v1/auth/login",
         json={"email": email, "password": password},
     )
 
@@ -26,7 +26,7 @@ async def test_login_email_not_found(faker: Faker, async_client: AsyncClient) ->
 @pytest.mark.login
 async def test_login_invalid_password(user: User, async_client: AsyncClient) -> None:
     response = await async_client.post(
-        "/auth/login",
+        "/api/v1/auth/login",
         json={"email": user.email, "password": "wrong-password"},
     )
 
@@ -36,7 +36,7 @@ async def test_login_invalid_password(user: User, async_client: AsyncClient) -> 
 @pytest.mark.login
 async def test_login_success(user: User, async_client: AsyncClient) -> None:
     response = await async_client.post(
-        "/auth/login",
+        "/api/v1/auth/login",
         json={"email": user.email, "password": "password@12345"},
     )
 

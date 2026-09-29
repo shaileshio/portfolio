@@ -28,9 +28,9 @@ def create_app() -> FastAPI:
     setup_middlewares(app)
     setup_swagger_ui(app)
 
+    app.include_router(router)
+
     return app
 
 
 app: FastAPI = create_app()
-
-app.include_router(router, prefix="/api/v1")

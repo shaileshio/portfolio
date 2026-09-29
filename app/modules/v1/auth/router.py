@@ -2,10 +2,15 @@ from fastapi import APIRouter, Request
 
 from app.db.depends import AsyncSessionDep
 from app.db.models.user import User
-from app.modules.auth.schemas import TokenResponse
 
 from .depends import AuthServiceDep
-from .schemas import LoginRequest, LogoutRequest, RegisterRequest, RegisterResponse
+from .schemas import (
+    LoginRequest,
+    LogoutRequest,
+    RegisterRequest,
+    RegisterResponse,
+    TokenResponse,
+)
 
 router = APIRouter(prefix="/auth", tags=["Authencation"])
 
