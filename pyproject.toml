@@ -86,6 +86,7 @@ filterwarnings = ["error"]
 markers = [
     "unit: isolated unit tests with no external infrastructure",
     "api: FastAPI HTTP/API tests",
+    "health: tests for health-check endpoints",
     "integration: tests involving multiple real application components",
     "e2e: end-to-end business workflow tests",
     "slow: tests that take significantly longer to execute",
