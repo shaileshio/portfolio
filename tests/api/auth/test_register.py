@@ -6,6 +6,7 @@ from app.db.models.user import User
 
 
 @pytest.mark.api
+@pytest.mark.auth
 async def test_register_password_missmatch(async_client: AsyncClient) -> None:
     response = await async_client.post(
         "/auth/register",
@@ -20,6 +21,7 @@ async def test_register_password_missmatch(async_client: AsyncClient) -> None:
 
 
 @pytest.mark.api
+@pytest.mark.auth
 async def test_register_success(async_client: AsyncClient) -> None:
     response = await async_client.post(
         "/auth/register",
@@ -34,6 +36,7 @@ async def test_register_success(async_client: AsyncClient) -> None:
 
 
 @pytest.mark.api
+@pytest.mark.auth
 async def test_register_email_exists(
     async_client: AsyncClient, async_session: AsyncSession
 ) -> None:
