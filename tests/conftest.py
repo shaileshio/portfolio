@@ -10,28 +10,21 @@ from sqlalchemy.ext.asyncio import (
 )
 
 from app.core.config import get_settings
-from app.db.depends import get_async_session
+from app.db.session import get_async_session
 from app.main import app
 
 from .fixtures import *
 
 settings = get_settings()
 
-TEST_DATABASE_URL = settings.database.test_url
-
-if not TEST_DATABASE_URL:
-    raise RuntimeError("Test database URL is not configured.")
+TEST_DATABASE_URL = settings.database.get_test_url()
 
 type AsyncSessionGenerator = AsyncGenerator[AsyncSession]
 
 
 @pytest_asyncio.fixture
 async def async_engine() -> AsyncGenerator[AsyncEngine]:
-    engine = create_async_engine(
-        TEST_DATABASE_URL,  # type: ignore
-        echo=False,
-        pool_pre_ping=True,
-    )
+    engine = create_async_engine(TEST_DATABASE_URL, echo=False, pool_pre_ping=True)
 
     try:
         yield engine

@@ -1,6 +1,5 @@
 import asyncio
 from logging.config import fileConfig
-from typing import cast
 
 from alembic import context
 from sqlalchemy import pool
@@ -14,10 +13,10 @@ from app.db.base import Base
 settings: Settings = get_settings()
 
 
-DATABASE_URL: str | None = settings.database.url
+DATABASE_URL = settings.database.get_url()
 
-if not DATABASE_URL:
-    raise RuntimeError("Test database URL is not configured.")
+if settings.app.env == "test":
+    DATABASE_URL = settings.database.get_test_url()  # type: ignore
 
 
 # this is the Alembic Config object, which provides
@@ -54,7 +53,7 @@ def run_migrations_offline() -> None:
 
     """
     # url: str | None = config.get_main_option("sqlalchemy.url")
-    url: str | None = DATABASE_URL
+    url = DATABASE_URL
 
     context.configure(
         url=url,
@@ -81,7 +80,7 @@ async def run_async_migrations() -> None:
     """
 
     configuration: dict[str, str] = config.get_section(config.config_ini_section, {})
-    configuration["sqlalchemy.url"] = cast(str, DATABASE_URL)
+    configuration["sqlalchemy.url"] = DATABASE_URL
 
     connectable: AsyncEngine = async_engine_from_config(
         configuration=configuration,

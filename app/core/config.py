@@ -1,4 +1,5 @@
 from functools import lru_cache
+from typing import Literal
 
 from cryptography.fernet import Fernet
 from pydantic import BaseModel, Field
@@ -8,6 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class AppConfig(BaseModel):
     title: str = "Portfolio Builder"
     description: str = "Production-grade AI-powered engineering portfolio builder"
+    env: Literal["test", "development", "production"] = "production"
     debug: bool = True
 
 
@@ -21,6 +23,18 @@ class CorsConfig(BaseModel):
 class DatabaseConfig(BaseModel):
     url: str | None = None
     test_url: str | None = None
+
+    def get_url(self) -> str:
+        if self.url is None:
+            raise RuntimeError("Database URL is not configured.")
+
+        return self.url
+
+    def get_test_url(self) -> str:
+        if self.test_url is None:
+            raise RuntimeError("Test database URL is not configured.")
+
+        return self.test_url
 
 
 class TokenConfig(BaseSettings):
