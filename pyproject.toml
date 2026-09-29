@@ -84,9 +84,11 @@ asyncio_mode = "auto"
 pythonpath = ["."]
 filterwarnings = ["error"]
 markers = [
-    "unit: Unit tests that test isolated components",
-    "integration: Integration tests that interact with external components",
-    "slow: Tests that take longer to execute",
+    "unit: isolated unit tests with no external infrastructure",
+    "api: FastAPI HTTP/API tests",
+    "integration: tests involving multiple real application components",
+    "e2e: end-to-end business workflow tests",
+    "slow: tests that take significantly longer to execute",
 ]
 
 # =============================================================================
