@@ -1,4 +1,4 @@
-from datetime import UTC, datetime, timedelta
+from datetime import timedelta
 
 from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -11,7 +11,12 @@ from app.core.security.tokens.provider import get_token_manager
 from app.db.models import User
 from app.db.repositories import UserRepository
 from app.db.repositories.user_session import UserSessionRepository
-from app.shared.ipaddress import get_client_ip
+from app.shared.datetime import get_utc_now
+from app.shared.request import (
+    get_device_name,
+    get_ip_address,
+    get_user_agent,
+)
 
 from .errors import (
     ConfirmPasswordNotMatchError,
@@ -64,14 +69,23 @@ class AuthService:
         if not self._hasher.verify(data.password, user.password_hash):
             raise InvalidPasswordError
 
+        utc_now = get_utc_now()
+
+        access_expires_at = utc_now + timedelta(
+            minutes=settings.token.access_expire_minutes
+        )
+        refresh_expires_at = utc_now + timedelta(
+            minutes=settings.token.refresh_expire_minutes
+        )
+
         access = self._token_manager.create(
             subject=f"user:{user.id!s}",
-            expire_minutes=settings.token.access_expire_minutes,
+            expires_at=access_expires_at,
             claims={"type": TokenType.ACCESS.value},
         )
         refresh = self._token_manager.create(
             subject=f"user:{user.id!s}",
-            expire_minutes=settings.token.refresh_expire_minutes,
+            expires_at=refresh_expires_at,
             claims={"type": TokenType.REFRESH.value},
         )
 
@@ -79,11 +93,10 @@ class AuthService:
             user_id=user.id,
             token_family_id=uuid7(),
             refresh_token_hash=self._hasher.hash(refresh),
-            expires_at=datetime.now(UTC)
-            + timedelta(minutes=settings.token.refresh_expire_minutes),
-            ip_address=get_client_ip(request),
-            user_agent=request.headers.get("user-agent"),
-            device_name=request.headers.get("host"),
+            expires_at=refresh_expires_at,
+            ip_address=get_ip_address(request),
+            user_agent=get_user_agent(request),
+            device_name=get_device_name(request),
         )
         await self._session.commit()
 

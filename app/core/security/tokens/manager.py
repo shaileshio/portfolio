@@ -1,5 +1,5 @@
 from collections.abc import Mapping
-from datetime import timedelta
+from datetime import datetime
 from typing import Any
 
 from app.core.config import get_settings
@@ -17,14 +17,14 @@ class TokenManager:
         self.verifier = verifier
 
     def create(
-        self, *, subject: str, expire_minutes: int, claims: Mapping[str, Any]
+        self, *, subject: str, expires_at: datetime, claims: Mapping[str, Any]
     ) -> str:
         return create_token(
             subject=subject,
             claims=claims,
+            expires_at=expires_at,
             secret_key=self.secret_key,
             algorithm=self.algorithm,
-            expires_in=timedelta(minutes=expire_minutes),
         )
 
     def verify(self, *, token: str, subject: str) -> dict[str, Any]:
