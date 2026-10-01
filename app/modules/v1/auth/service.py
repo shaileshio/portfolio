@@ -140,17 +140,15 @@ class AuthService:
         access_expires_at = utc_now + timedelta(minutes=access_token_lifetime)
 
         if session.is_refresh_expired():
-            session.refresh_expires_at = refresh_expires_at
-            session.ip_address = get_ip_address(request)
-            session.user_agent = get_user_agent(request)
-            session.device_name = get_device_name(request)
-
             refresh_token = self._token_manager.create(
                 subject=claims["sub"],
                 issue_at=utc_now,
                 expires_at=refresh_expires_at,
                 claims={"type": TokenType.REFRESH.value, "sid": str(session.id)},
             )
+
+            session.refresh_token_hash = self._hasher.hash(refresh_token)
+            session.refresh_expires_at = refresh_expires_at
 
         access_token = self._token_manager.create(
             subject=claims["sub"],
@@ -160,6 +158,9 @@ class AuthService:
         )
 
         session.touch()
+        session.ip_address = get_ip_address(request)
+        session.user_agent = get_user_agent(request)
+        session.device_name = get_device_name(request)
 
         await self._session.commit()
 
