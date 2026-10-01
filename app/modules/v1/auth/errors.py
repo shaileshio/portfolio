@@ -42,7 +42,7 @@ class EmailAlreadyExistError(ConflictError):
         detail: str = "Email already exist",
         *,
         code: str = "email_exist",
-        status: int = 409,
+        status: int = status.HTTP_409_CONFLICT,
     ) -> None:
         super().__init__(detail, code=code, status=status)
 
