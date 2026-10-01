@@ -6,7 +6,7 @@ from jose import JWTError as JoseJWTError
 
 from app.shared.datetime import get_utc_now
 
-from .errors import ExpiredTokenSignatureError, InvalidTokenError, TokenRevokedError
+from .errors import ExpiredTokenSignatureError, InvalidTokenError, TokenExpiredError
 
 logger = getLogger(__name__)
 
@@ -42,4 +42,4 @@ class TokenVerifier:
         ttl = max(claims["exp"] - int(get_utc_now().timestamp()), 0)
 
         if ttl < 0:
-            raise TokenRevokedError
+            raise TokenExpiredError

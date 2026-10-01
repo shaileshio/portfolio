@@ -16,6 +16,6 @@ class ExpiredTokenSignatureError(TokenError):
         super().__init__(detail)
 
 
-class TokenRevokedError(TokenError):
+class TokenExpiredError(TokenError):
     def __init__(self, detail: str = "Token revoked") -> None:
         super().__init__(detail)
