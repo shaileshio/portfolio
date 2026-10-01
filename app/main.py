@@ -11,9 +11,9 @@ configure_logging()
 
 settings: Settings = get_settings()
 
-title: str = settings.app.title
-description: str = settings.app.description
-debug: bool = settings.app.debug
+title = settings.app.title
+description = settings.app.description
+debug = settings.app.env != "production"
 
 
 def create_app() -> FastAPI:

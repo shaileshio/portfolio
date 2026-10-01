@@ -2,11 +2,13 @@ from logging.config import dictConfig
 from sys import stdout
 from typing import Any, Literal
 
-from app.core.config import Settings, get_settings
+from app.core.config import get_settings
 
-settings: Settings = get_settings()
+settings = get_settings()
+debug = settings.app.env != "production"
 
-LOG_LEVEL: Literal["DEBUG", "INFO"] = "DEBUG" if settings.app.debug else "INFO"
+
+LOG_LEVEL: Literal["DEBUG", "INFO"] = "DEBUG" if debug else "INFO"
 
 LOGGING_CONFIG: dict[str, Any] = {
     "version": 1,

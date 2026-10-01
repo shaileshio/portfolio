@@ -10,7 +10,6 @@ class AppConfig(BaseModel):
     title: str = "Portfolio Builder"
     description: str = "Production-grade AI-powered engineering portfolio builder"
     env: Literal["test", "development", "production"] = "production"
-    debug: bool = True
 
 
 class CorsConfig(BaseModel):
@@ -37,11 +36,13 @@ class DatabaseConfig(BaseModel):
         return self.test_url
 
 
-class TokenConfig(BaseSettings):
-    secret_key: str = Fernet.generate_key().decode()
-    algorithm: str = "HS256"
-    access_expire_minutes: int = 30
-    refresh_expire_minutes: int = 60 * 7
+class AuthConfig(BaseModel):
+    jwt_secret_key: str = Fernet.generate_key().decode()
+    jwt_hashing_algorithm: str = "HS256"
+
+    access_token_lifetime: int = 30
+    refresh_token_lifetime: int = 60 * 7
+    session_lifetime: int = 60 * 720
 
 
 class Settings(BaseSettings):
@@ -56,7 +57,7 @@ class Settings(BaseSettings):
     app: AppConfig = Field(default_factory=AppConfig)
     cors: CorsConfig = Field(default_factory=CorsConfig)
     database: DatabaseConfig = Field(default_factory=DatabaseConfig)
-    token: TokenConfig = Field(default_factory=TokenConfig)
+    auth: AuthConfig = Field(default_factory=AuthConfig)
 
 
 @lru_cache

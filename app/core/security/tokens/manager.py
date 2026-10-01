@@ -9,12 +9,15 @@ from .verifier import TokenVerifier
 
 settings = get_settings()
 
+secret_key = settings.auth.jwt_secret_key
+algorithm = settings.auth.jwt_hashing_algorithm
+
 
 class TokenManager:
     def __init__(self, verifier: TokenVerifier) -> None:
-        self.secret_key = settings.token.secret_key
-        self.algorithm = settings.token.algorithm
-        self.verifier = verifier
+        self._secret_key = secret_key
+        self._algorithm = algorithm
+        self._verifier = verifier
 
     def create(
         self, *, subject: str, expires_at: datetime, claims: Mapping[str, Any]
@@ -23,13 +26,13 @@ class TokenManager:
             subject=subject,
             claims=claims,
             expires_at=expires_at,
-            secret_key=self.secret_key,
-            algorithm=self.algorithm,
+            secret_key=self._secret_key,
+            algorithm=self._algorithm,
         )
 
     def verify(self, token: str) -> dict[str, Any]:
-        return self.verifier.verify_token(
+        return self._verifier.verify_token(
             token=token,
-            secret_key=self.secret_key,
-            algorithm=self.algorithm,
+            secret_key=self._secret_key,
+            algorithm=self._algorithm,
         )
