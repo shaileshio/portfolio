@@ -7,6 +7,7 @@ from .depends import AuthServiceDep
 from .schemas import (
     LoginRequest,
     LogoutRequest,
+    RefreshRequest,
     RegisterRequest,
     RegisterResponse,
     TokenResponse,
@@ -34,6 +35,15 @@ async def login(
     request: Request, data: LoginRequest, service: AuthServiceDep
 ) -> TokenResponse:
     return await service.create_jwt_tokens(request, data)
+
+
+@router.post(
+    "/refresh",
+    summary="Refresh access token",
+    description="Issue a new access token using a valid refresh token.",
+)
+async def refresh(data: RefreshRequest, service: AuthServiceDep) -> TokenResponse:
+    return await service.rotate_refresh_token(data.refresh_token)
 
 
 @router.post(

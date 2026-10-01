@@ -28,6 +28,10 @@ from .schemas import LoginRequest, RegisterRequest, TokenResponse
 
 settings = get_settings()
 
+access_token_lifetime = settings.auth.access_token_lifetime
+refresh_token_lifetime = settings.auth.refresh_token_lifetime
+session_lifetime = settings.auth.session_lifetime
+
 
 class AuthService:
     def __init__(
@@ -70,34 +74,33 @@ class AuthService:
             raise InvalidPasswordError
 
         utc_now = get_utc_now()
+        subject = str(user.id)
 
-        access_expires_at = utc_now + timedelta(
-            minutes=settings.token.access_expire_minutes
-        )
-        refresh_expires_at = utc_now + timedelta(
-            minutes=settings.token.refresh_expire_minutes
-        )
+        access_expires_at = utc_now + timedelta(minutes=access_token_lifetime)
+        refresh_expires_at = utc_now + timedelta(minutes=refresh_token_lifetime)
 
-        access = self._token_manager.create(
-            subject=f"user:{user.id!s}",
-            expires_at=access_expires_at,
-            claims={"type": TokenType.ACCESS.value},
-        )
-        refresh = self._token_manager.create(
-            subject=f"user:{user.id!s}",
-            expires_at=refresh_expires_at,
-            claims={"type": TokenType.REFRESH.value},
-        )
-
-        await self._user_session_repo.create(
+        session = await self._user_session_repo.create(
             user_id=user.id,
-            token_family_id=uuid7(),
-            refresh_token_hash=self._hasher.hash(refresh),
-            expires_at=refresh_expires_at,
+            refresh_token_hash=str(uuid7()),
+            refresh_expires_at=refresh_expires_at,
+            session_expires_at=utc_now + timedelta(minutes=session_lifetime),
             ip_address=get_ip_address(request),
             user_agent=get_user_agent(request),
             device_name=get_device_name(request),
         )
+
+        access_token = self._token_manager.create(
+            subject=subject,
+            expires_at=access_expires_at,
+            claims={"type": TokenType.ACCESS.value},
+        )
+        refresh_token = self._token_manager.create(
+            subject=subject,
+            expires_at=refresh_expires_at,
+            claims={"type": TokenType.REFRESH.value, "sid": str(session.id)},
+        )
+
+        session.refresh_token_hash = self._hasher.hash(refresh_token)
         await self._session.commit()
 
-        return TokenResponse(access_token=access, refresh_token=refresh)
+        return TokenResponse(access_token=access_token, refresh_token=refresh_token)
