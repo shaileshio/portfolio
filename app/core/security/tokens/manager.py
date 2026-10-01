@@ -27,10 +27,9 @@ class TokenManager:
             algorithm=self.algorithm,
         )
 
-    def verify(self, *, token: str, subject: str) -> dict[str, Any]:
+    def verify(self, token: str) -> dict[str, Any]:
         return self.verifier.verify_token(
             token=token,
-            subject=subject,
             secret_key=self.secret_key,
             algorithm=self.algorithm,
         )

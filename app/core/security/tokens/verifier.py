@@ -4,14 +4,16 @@ from typing import Any
 from jose import ExpiredSignatureError, jwt
 from jose import JWTError as JoseJWTError
 
-from .errors import ExpiredTokenSignatureError, InvalidTokenError
+from app.shared.datetime import get_utc_now
+
+from .errors import ExpiredTokenSignatureError, InvalidTokenError, TokenRevokedError
 
 logger = getLogger(__name__)
 
 
 class TokenVerifier:
     def verify_token(
-        self, *, token: str, subject: str, secret_key: str, algorithm: str
+        self, *, token: str, secret_key: str, algorithm: str
     ) -> dict[str, Any]:
         try:
             claims = jwt.decode(
@@ -27,11 +29,17 @@ class TokenVerifier:
             logger.debug("Invalid Jwt", exc_info=exc)
             raise InvalidTokenError
 
-        self._validate(subject, claims)
+        self._validate(claims)
+
         return claims
 
     @staticmethod
-    def _validate(subject: str, claims: dict[str, Any]) -> None:
+    def _validate(claims: dict[str, Any]) -> None:
         required = {"sub", "exp", "iat", "jti"}
-        if not required.issubset(claims) and claims["sub"] != subject:
+        if not required.issubset(claims):
             raise InvalidTokenError
+
+        ttl = max(claims["exp"] - int(get_utc_now().timestamp()), 0)
+
+        if ttl < 0:
+            raise TokenRevokedError
