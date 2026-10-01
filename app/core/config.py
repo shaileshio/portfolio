@@ -40,9 +40,9 @@ class AuthConfig(BaseModel):
     jwt_secret_key: str = Fernet.generate_key().decode()
     jwt_hashing_algorithm: str = "HS256"
 
-    access_token_lifetime: int = 30
-    refresh_token_lifetime: int = 60 * 7
-    session_lifetime: int = 60 * 720
+    access_token_lifetime: float = 30
+    refresh_token_lifetime: float = 60 * 7
+    session_lifetime: float = 60 * 720
 
 
 class Settings(BaseSettings):
