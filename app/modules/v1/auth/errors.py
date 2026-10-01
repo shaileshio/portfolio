@@ -61,9 +61,20 @@ class UserSessionNotFoundError(NotFoundError):
 class InvalidRefreshTokenError(NotFoundError):
     def __init__(
         self,
-        detail: str = "Invalid token type. Please provide refresh token",
+        detail: str = "Invalid refresh token type. Please provide a valid token",
         *,
-        code: str = "invalid_password",
+        code: str = "invalid_refresh_token",
+        status: int = status.HTTP_400_BAD_REQUEST,
+    ) -> None:
+        super().__init__(detail, code=code, status=status)
+
+
+class SessionExpiredError(NotFoundError):
+    def __init__(
+        self,
+        detail: str = "Session expired! please login again",
+        *,
+        code: str = "session_expired",
         status: int = status.HTTP_400_BAD_REQUEST,
     ) -> None:
         super().__init__(detail, code=code, status=status)

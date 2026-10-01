@@ -1,4 +1,5 @@
 from datetime import timedelta
+from uuid import UUID
 
 from fastapi import Request
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -22,6 +23,8 @@ from .errors import (
     ConfirmPasswordNotMatchError,
     EmailAlreadyExistError,
     InvalidPasswordError,
+    InvalidRefreshTokenError,
+    SessionExpiredError,
     UserNotFoundError,
 )
 from .schemas import LoginRequest, RegisterRequest, TokenResponse
@@ -91,16 +94,73 @@ class AuthService:
 
         access_token = self._token_manager.create(
             subject=subject,
+            issue_at=utc_now,
             expires_at=access_expires_at,
             claims={"type": TokenType.ACCESS.value},
         )
         refresh_token = self._token_manager.create(
             subject=subject,
+            issue_at=utc_now,
             expires_at=refresh_expires_at,
             claims={"type": TokenType.REFRESH.value, "sid": str(session.id)},
         )
 
         session.refresh_token_hash = self._hasher.hash(refresh_token)
+
+        await self._session.commit()
+
+        return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+    async def rotate_refresh_token(
+        self, request: Request, refresh_token: str
+    ) -> TokenResponse:
+
+        claims = self._token_manager.verify(refresh_token)
+
+        session = await self._user_session_repo.get_by_ids(
+            user_id=UUID(claims["sub"]), session_id=UUID(claims["sid"])
+        )
+
+        if (
+            claims["type"] != TokenType.REFRESH.value
+            or not session
+            or not self._hasher.verify(
+                value=refresh_token,
+                hashed=session.refresh_token_hash,
+            )
+        ):
+            raise InvalidRefreshTokenError
+
+        if session.is_session_expired():
+            raise SessionExpiredError
+
+        utc_now = get_utc_now()
+
+        refresh_expires_at = utc_now + timedelta(minutes=refresh_token_lifetime)
+        access_expires_at = utc_now + timedelta(minutes=access_token_lifetime)
+
+        if session.is_refresh_expired():
+            session.refresh_expires_at = refresh_expires_at
+            session.ip_address = get_ip_address(request)
+            session.user_agent = get_user_agent(request)
+            session.device_name = get_device_name(request)
+
+            refresh_token = self._token_manager.create(
+                subject=claims["sub"],
+                issue_at=utc_now,
+                expires_at=refresh_expires_at,
+                claims={"type": TokenType.REFRESH.value, "sid": str(session.id)},
+            )
+
+        access_token = self._token_manager.create(
+            subject=claims["sub"],
+            issue_at=utc_now,
+            expires_at=access_expires_at,
+            claims={"type": TokenType.ACCESS.value},
+        )
+
+        session.touch()
+
         await self._session.commit()
 
         return TokenResponse(access_token=access_token, refresh_token=refresh_token)

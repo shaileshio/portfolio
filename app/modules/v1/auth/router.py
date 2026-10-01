@@ -42,8 +42,10 @@ async def login(
     summary="Refresh access token",
     description="Issue a new access token using a valid refresh token.",
 )
-async def refresh(data: RefreshRequest, service: AuthServiceDep) -> TokenResponse:
-    return await service.rotate_refresh_token(data.refresh_token)
+async def refresh(
+    request: Request, data: RefreshRequest, service: AuthServiceDep
+) -> TokenResponse:
+    return await service.rotate_refresh_token(request, data.refresh_token)
 
 
 @router.post(

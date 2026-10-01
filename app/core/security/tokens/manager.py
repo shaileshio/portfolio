@@ -20,11 +20,17 @@ class TokenManager:
         self._verifier = verifier
 
     def create(
-        self, *, subject: str, expires_at: datetime, claims: Mapping[str, Any]
+        self,
+        *,
+        subject: str,
+        issue_at: datetime,
+        expires_at: datetime,
+        claims: Mapping[str, Any],
     ) -> str:
         return create_token(
             subject=subject,
             claims=claims,
+            issue_at=issue_at,
             expires_at=expires_at,
             secret_key=self._secret_key,
             algorithm=self._algorithm,
