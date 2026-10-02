@@ -61,7 +61,7 @@ class UserSessionNotFoundError(NotFoundError):
 class InvalidTokenError(NotFoundError):
     def __init__(
         self,
-        detail: str = "Invalid token type.",
+        detail: str = "Invalid token type",
         *,
         code: str = "invalid_token",
         status: int = status.HTTP_400_BAD_REQUEST,
