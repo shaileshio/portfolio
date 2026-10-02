@@ -88,15 +88,17 @@ addopts = """
 """
 
 markers = [
-    "unit: isolated unit tests with no external infrastructure",
-    "api: FastAPI HTTP/API tests",
-    "health: tests for health-check endpoints",
-    "auth: authentication and authorization tests",
-    "register: tests only for register related endpoints",
-    "login: tests coly for login related endpoints",
-    "integration: tests involving multiple real application components",
-    "e2e: end-to-end business workflow tests",
-    "slow: tests that take significantly longer to execute",
+    "unit: tests for isolated units with no external dependencies",
+    "api: tests covering FastAPI HTTP endpoints and request/response flows",
+    "health: tests for health-check and readiness endpoints",
+    "auth: tests for authentication and authorization behaviors",
+    "register: tests for user registration endpoints and flows",
+    "login: tests for user login endpoints and flows",
+    "refresh: tests for token refresh endpoints and flows",
+    "logout: tests for user logout endpoints and flows",
+    "integration: tests exercising multiple real application components together",
+    "e2e: end-to-end tests covering complete business workflows across the system",
+    "slow: tests expected to run noticeably longer than standard unit or API checks",
 ]
 
 # =============================================================================
