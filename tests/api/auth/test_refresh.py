@@ -10,7 +10,6 @@ pytestmark = [
 
 
 @pytest.mark.refresh
-@pytest.mark.skip
 async def test_refresh_token_field_required(async_client: AsyncClient) -> None:
     response = await async_client.post(
         "/api/v1/auth/refresh",
@@ -21,7 +20,6 @@ async def test_refresh_token_field_required(async_client: AsyncClient) -> None:
 
 
 @pytest.mark.refresh
-@pytest.mark.skip
 async def test_invalid_refresh(async_client: AsyncClient) -> None:
     response = await async_client.post(
         "/api/v1/auth/refresh",
@@ -32,7 +30,6 @@ async def test_invalid_refresh(async_client: AsyncClient) -> None:
 
 
 @pytest.mark.refresh
-@pytest.mark.skip
 async def test_refresh_success(
     async_client: AsyncClient, user: User, password: str
 ) -> None:
