@@ -12,7 +12,7 @@ pytestmark = [
 
 @pytest.mark.register
 async def test_register_password_missmatch(
-    faker: Faker, async_client: AsyncClient
+    async_client: AsyncClient, faker: Faker
 ) -> None:
     email = faker.unique.email()
     password = faker.password()
@@ -30,7 +30,7 @@ async def test_register_password_missmatch(
 
 
 @pytest.mark.register
-async def test_register_success(faker: Faker, async_client: AsyncClient) -> None:
+async def test_register_success(async_client: AsyncClient, faker: Faker) -> None:
     email = faker.unique.email()
     password = faker.password()
 
@@ -47,7 +47,7 @@ async def test_register_success(faker: Faker, async_client: AsyncClient) -> None
 
 
 @pytest.mark.register
-async def test_register_email_exists(user: User, async_client: AsyncClient) -> None:
+async def test_register_email_exists(async_client: AsyncClient, user: User) -> None:
     response = await async_client.post(
         "/api/v1/auth/register",
         json={

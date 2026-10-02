@@ -1,5 +1,6 @@
 # tests/conftest.py
 
+import pytest
 import pytest_asyncio
 from faker import Faker
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -8,14 +9,18 @@ from app.core.security.hashing.providers import get_hasher
 from app.db.models import User
 
 
+@pytest.fixture
+def password() -> str:
+    return "password@12345"
+
+
 @pytest_asyncio.fixture
-async def user(faker: Faker, async_session: AsyncSession) -> User:
+async def user(faker: Faker, password: str, async_session: AsyncSession) -> User:
     email = faker.unique.email()
-    raw_password = "password@12345"
 
     hasher = get_hasher()
 
-    passowrd = hasher.hash(raw_password)
+    passowrd = hasher.hash(password)
     user = User(email=email, password_hash=passowrd)
 
     async_session.add(user)

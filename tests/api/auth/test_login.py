@@ -11,7 +11,7 @@ pytestmark = [
 
 
 @pytest.mark.login
-async def test_login_email_not_found(faker: Faker, async_client: AsyncClient) -> None:
+async def test_login_email_not_found(async_client: AsyncClient, faker: Faker) -> None:
     email = faker.unique.email()
     password = faker.password()
 
@@ -24,7 +24,7 @@ async def test_login_email_not_found(faker: Faker, async_client: AsyncClient) ->
 
 
 @pytest.mark.login
-async def test_login_invalid_password(user: User, async_client: AsyncClient) -> None:
+async def test_login_invalid_password(async_client: AsyncClient, user: User) -> None:
     response = await async_client.post(
         "/api/v1/auth/login",
         json={"email": user.email, "password": "wrong-password"},
@@ -34,10 +34,12 @@ async def test_login_invalid_password(user: User, async_client: AsyncClient) -> 
 
 
 @pytest.mark.login
-async def test_login_success(user: User, async_client: AsyncClient) -> None:
+async def test_login_success(
+    async_client: AsyncClient, user: User, password: str
+) -> None:
     response = await async_client.post(
         "/api/v1/auth/login",
-        json={"email": user.email, "password": "password@12345"},
+        json={"email": user.email, "password": password},
     )
 
     assert response.status_code == 200
