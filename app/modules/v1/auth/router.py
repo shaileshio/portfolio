@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request
 
-from app.db.depends import AsyncSessionDep
 from app.db.models.user import User
+from app.modules.v1.auth.schemas import LogoutResponse
 
 from .depends import AuthServiceDep
 from .schemas import (
@@ -23,7 +23,9 @@ router = APIRouter(prefix="/auth", tags=["Authencation"])
     response_model=RegisterResponse,
 )
 async def register(data: RegisterRequest, service: AuthServiceDep) -> User:
-    return await service.create_active_user(data)
+    return await service.create_active_user(
+        data.email, data.password, data.confirm_password
+    )
 
 
 @router.post(
@@ -34,7 +36,7 @@ async def register(data: RegisterRequest, service: AuthServiceDep) -> User:
 async def login(
     request: Request, data: LoginRequest, service: AuthServiceDep
 ) -> TokenResponse:
-    return await service.create_jwt_tokens(request, data)
+    return await service.create_jwt_tokens(request, data.email, data.password)
 
 
 @router.post(
@@ -53,4 +55,7 @@ async def refresh(
     summary="Log out of the current session",
     description="Log out by invalidating the current authentication session.",
 )
-async def logout(data: LogoutRequest, session: AsyncSessionDep): ...
+async def logout(
+    request: Request, data: LogoutRequest, service: AuthServiceDep
+) -> LogoutResponse:
+    return await service.logout(request, data.refresh_token)

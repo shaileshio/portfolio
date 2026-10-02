@@ -27,7 +27,7 @@ from .errors import (
     SessionExpiredError,
     UserNotFoundError,
 )
-from .schemas import LoginRequest, RegisterRequest, TokenResponse
+from .schemas import LogoutResponse, TokenResponse
 
 settings = get_settings()
 
@@ -49,16 +49,17 @@ class AuthService:
         self._hasher = get_hasher()
         self._token_manager = get_token_manager()
 
-    async def create_active_user(self, data: RegisterRequest) -> User:
-        if data.password != data.confirm_password:
+    async def create_active_user(
+        self, email: str, password: str, confirm_password: str
+    ) -> User:
+
+        if password != confirm_password:
             raise ConfirmPasswordNotMatchError
 
-        if await self._user_repo.email_exists(data.email):
+        if await self._user_repo.email_exists(email):
             raise EmailAlreadyExistError
 
-        user = await self._user_repo.create(
-            data.email, self._hasher.hash(data.password)
-        )
+        user = await self._user_repo.create(email, self._hasher.hash(password))
 
         await self._session.commit()
         await self._session.refresh(user)
@@ -66,14 +67,14 @@ class AuthService:
         return user
 
     async def create_jwt_tokens(
-        self, request: Request, data: LoginRequest
+        self, request: Request, email: str, password: str
     ) -> TokenResponse:
-        user = await self._user_repo.get_by_email(data.email)
+        user = await self._user_repo.get_by_email(email)
 
         if user is None:
             raise UserNotFoundError
 
-        if not self._hasher.verify(data.password, user.password_hash):
+        if not self._hasher.verify(password, user.password_hash):
             raise InvalidPasswordError
 
         utc_now = get_utc_now()
@@ -164,6 +165,7 @@ class AuthService:
         )
 
         session.touch()
+
         session.ip_address = get_ip_address(request)
         session.user_agent = get_user_agent(request)
         session.device_name = get_device_name(request)
@@ -171,3 +173,38 @@ class AuthService:
         await self._session.commit()
 
         return TokenResponse(access_token=access_token, refresh_token=refresh_token)
+
+    async def logout(self, request: Request, refresh_token: str) -> LogoutResponse:
+
+        claims = self._token_manager.verify(refresh_token)
+
+        try:
+            user_id = claims["sub"]
+            session_id = claims["sid"]
+        except KeyError:
+            raise InvalidRefreshTokenError
+
+        session = await self._user_session_repo.get_by_ids(
+            user_id=UUID(user_id), session_id=UUID(session_id)
+        )
+
+        if (
+            claims["type"] != TokenType.REFRESH.value
+            or not session
+            or not self._hasher.verify(
+                value=refresh_token,
+                hashed=session.refresh_token_hash,
+            )
+        ):
+            raise InvalidRefreshTokenError
+
+        session.touch()
+        session.revoke()
+
+        session.ip_address = get_ip_address(request)
+        session.user_agent = get_user_agent(request)
+        session.device_name = get_device_name(request)
+
+        await self._session.commit()
+
+        return LogoutResponse(detail="Logout successful")

@@ -34,5 +34,8 @@ class TokenResponse(BaseModel):
 
 
 class LogoutRequest(BaseModel):
-    refresh: str
-    access: str
+    refresh_token: str
+
+
+class LogoutResponse(BaseModel):
+    detail: str
