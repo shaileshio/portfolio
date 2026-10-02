@@ -117,8 +117,14 @@ class AuthService:
 
         claims = self._token_manager.verify(refresh_token)
 
+        try:
+            user_id = claims["sub"]
+            session_id = claims["sid"]
+        except KeyError:
+            raise InvalidRefreshTokenError
+
         session = await self._user_session_repo.get_by_ids(
-            user_id=UUID(claims["sub"]), session_id=UUID(claims["sid"])
+            user_id=UUID(user_id), session_id=UUID(session_id)
         )
 
         if (
