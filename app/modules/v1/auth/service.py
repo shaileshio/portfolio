@@ -23,8 +23,9 @@ from .errors import (
     ConfirmPasswordNotMatchError,
     EmailAlreadyExistError,
     InvalidPasswordError,
-    InvalidRefreshTokenError,
+    InvalidTokenError,
     SessionExpiredError,
+    TokenRevokedError,
     UserNotFoundError,
 )
 from .schemas import LogoutResponse, TokenResponse
@@ -122,7 +123,7 @@ class AuthService:
             user_id = claims["sub"]
             session_id = claims["sid"]
         except KeyError:
-            raise InvalidRefreshTokenError
+            raise InvalidTokenError
 
         session = await self._user_session_repo.get_by_ids(
             user_id=UUID(user_id), session_id=UUID(session_id)
@@ -136,7 +137,10 @@ class AuthService:
                 hashed=session.refresh_token_hash,
             )
         ):
-            raise InvalidRefreshTokenError
+            raise InvalidTokenError
+
+        if session.is_revoked:
+            raise TokenRevokedError
 
         if session.is_session_expired():
             raise SessionExpiredError
@@ -182,7 +186,7 @@ class AuthService:
             user_id = claims["sub"]
             session_id = claims["sid"]
         except KeyError:
-            raise InvalidRefreshTokenError
+            raise InvalidTokenError
 
         session = await self._user_session_repo.get_by_ids(
             user_id=UUID(user_id), session_id=UUID(session_id)
@@ -196,15 +200,16 @@ class AuthService:
                 hashed=session.refresh_token_hash,
             )
         ):
-            raise InvalidRefreshTokenError
+            raise InvalidTokenError
 
-        session.touch()
-        session.revoke()
+        if not session.is_revoked:
+            session.touch()
+            session.revoke()
 
-        session.ip_address = get_ip_address(request)
-        session.user_agent = get_user_agent(request)
-        session.device_name = get_device_name(request)
+            session.ip_address = get_ip_address(request)
+            session.user_agent = get_user_agent(request)
+            session.device_name = get_device_name(request)
 
-        await self._session.commit()
+            await self._session.commit()
 
         return LogoutResponse(detail="Logout successful")

@@ -58,12 +58,23 @@ class UserSessionNotFoundError(NotFoundError):
         super().__init__(detail, code=code, status=status)
 
 
-class InvalidRefreshTokenError(NotFoundError):
+class InvalidTokenError(NotFoundError):
     def __init__(
         self,
-        detail: str = "Invalid refresh token type. Please provide a valid token",
+        detail: str = "Invalid token type.",
         *,
-        code: str = "invalid_refresh_token",
+        code: str = "invalid_token",
+        status: int = status.HTTP_400_BAD_REQUEST,
+    ) -> None:
+        super().__init__(detail, code=code, status=status)
+
+
+class TokenRevokedError(NotFoundError):
+    def __init__(
+        self,
+        detail: str = "Token revoked",
+        *,
+        code: str = "token_revoked",
         status: int = status.HTTP_400_BAD_REQUEST,
     ) -> None:
         super().__init__(detail, code=code, status=status)
