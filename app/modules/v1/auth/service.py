@@ -98,13 +98,19 @@ class AuthService:
             subject=subject,
             issue_at=utc_now,
             expires_at=access_expires_at,
-            claims={"type": TokenType.ACCESS.value},
+            claims={
+                "type": TokenType.ACCESS.value,
+                "sid": str(session.id),
+            },
         )
         refresh_token = self._token_manager.create(
             subject=subject,
             issue_at=utc_now,
             expires_at=refresh_expires_at,
-            claims={"type": TokenType.REFRESH.value, "sid": str(session.id)},
+            claims={
+                "type": TokenType.REFRESH.value,
+                "sid": str(session.id),
+            },
         )
 
         session.refresh_token_hash = self._hasher.hash(refresh_token)
@@ -155,7 +161,10 @@ class AuthService:
                 subject=claims["sub"],
                 issue_at=utc_now,
                 expires_at=refresh_expires_at,
-                claims={"type": TokenType.REFRESH.value, "sid": str(session.id)},
+                claims={
+                    "type": TokenType.REFRESH.value,
+                    "sid": str(session.id),
+                },
             )
 
             session.refresh_token_hash = self._hasher.hash(refresh_token)
@@ -165,7 +174,10 @@ class AuthService:
             subject=claims["sub"],
             issue_at=utc_now,
             expires_at=access_expires_at,
-            claims={"type": TokenType.ACCESS.value},
+            claims={
+                "type": TokenType.ACCESS.value,
+                "sid": str(session.id),
+            },
         )
 
         session.touch()
