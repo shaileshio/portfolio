@@ -2,6 +2,7 @@ from fastapi import APIRouter, Request
 
 from app.db.models.user import User
 from app.modules.v1.auth.schemas import LogoutResponse
+from app.shared.depends import CurrentUserDep
 
 from .depends import AuthServiceDep
 from .schemas import (
@@ -11,6 +12,7 @@ from .schemas import (
     RegisterRequest,
     RegisterResponse,
     TokenResponse,
+    UserResponse,
 )
 
 router = APIRouter(prefix="/auth", tags=["Authencation"])
@@ -59,3 +61,13 @@ async def logout(
     request: Request, data: LogoutRequest, service: AuthServiceDep
 ) -> LogoutResponse:
     return await service.logout(request, data.refresh_token)
+
+
+@router.get(
+    "/me",
+    summary="Get current authenticated user",
+    description="Return the authenticated user's profile information for the current session.",
+    response_model=UserResponse,
+)
+async def get_me(request: Request, user: CurrentUserDep) -> User:
+    return user
