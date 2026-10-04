@@ -25,8 +25,12 @@ type AsyncSessionGenerator = AsyncGenerator[AsyncSession]
 
 
 @pytest_asyncio.fixture
-async def async_engine() -> AsyncGenerator[AsyncEngine]:
-    engine = create_async_engine(TEST_DATABASE_URL, echo=False, pool_pre_ping=True)
+async def engine() -> AsyncGenerator[AsyncEngine]:
+    engine = create_async_engine(
+        TEST_DATABASE_URL,
+        echo=False,
+        pool_pre_ping=True,
+    )
 
     try:
         yield engine
@@ -35,10 +39,8 @@ async def async_engine() -> AsyncGenerator[AsyncEngine]:
 
 
 @pytest_asyncio.fixture
-async def async_connection(
-    async_engine: AsyncEngine,
-) -> AsyncGenerator[AsyncConnection]:
-    async with async_engine.connect() as connection:
+async def connection(engine: AsyncEngine) -> AsyncGenerator[AsyncConnection]:
+    async with engine.connect() as connection:
         transaction = await connection.begin()
 
         try:
@@ -49,9 +51,9 @@ async def async_connection(
 
 
 @pytest_asyncio.fixture
-async def async_session(async_connection: AsyncConnection) -> AsyncSessionGenerator:
+async def session(connection: AsyncConnection) -> AsyncSessionGenerator:
     async with AsyncSession(
-        bind=async_connection,
+        bind=connection,
         expire_on_commit=False,
         join_transaction_mode="create_savepoint",
     ) as session:
@@ -59,18 +61,18 @@ async def async_session(async_connection: AsyncConnection) -> AsyncSessionGenera
 
 
 @pytest_asyncio.fixture
-async def async_client(
-    async_session: AsyncSession, mock_current_user: User
+async def client(
+    session: AsyncSession, mock_current_user: User
 ) -> AsyncGenerator[AsyncClient]:
 
-    async def override_get_async_session() -> AsyncSessionGenerator:
-        yield async_session
+    async def override_get_session() -> AsyncSessionGenerator:
+        yield session
 
-    def override_get_current_user() -> User:
+    def override_mock_current_user() -> User:
         return mock_current_user
 
-    app.dependency_overrides[get_async_session] = override_get_async_session
-    app.dependency_overrides[get_current_user] = override_get_current_user
+    app.dependency_overrides[get_async_session] = override_get_session
+    app.dependency_overrides[get_current_user] = override_mock_current_user
 
     try:
         async with AsyncClient(

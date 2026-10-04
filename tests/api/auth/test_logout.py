@@ -10,8 +10,8 @@ pytestmark = [
 
 
 @pytest.mark.logout
-async def test_logout_field_required(async_client: AsyncClient) -> None:
-    response = await async_client.post(
+async def test_logout_field_required(client: AsyncClient) -> None:
+    response = await client.post(
         "/api/v1/auth/logout",
         json={},
     )
@@ -20,8 +20,8 @@ async def test_logout_field_required(async_client: AsyncClient) -> None:
 
 
 @pytest.mark.logout
-async def test_logout_invalid_token(async_client: AsyncClient) -> None:
-    response = await async_client.post(
+async def test_logout_invalid_token(client: AsyncClient) -> None:
+    response = await client.post(
         "/api/v1/auth/logout",
         json={"refresh_token": "invalid-refresh-token"},
     )
@@ -30,16 +30,14 @@ async def test_logout_invalid_token(async_client: AsyncClient) -> None:
 
 
 @pytest.mark.logout
-async def test_logout_success(
-    async_client: AsyncClient, user: User, password: str
-) -> None:
+async def test_logout_success(client: AsyncClient, user: User, password: str) -> None:
 
-    login_response = await async_client.post(
+    login_response = await client.post(
         "/api/v1/auth/login",
         json={"email": user.email, "password": password},
     )
 
-    logout_response = await async_client.post(
+    logout_response = await client.post(
         "/api/v1/auth/logout",
         json={"refresh_token": login_response.json()["refresh_token"]},
     )

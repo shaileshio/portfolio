@@ -15,17 +15,17 @@ def password() -> str:
 
 
 @pytest_asyncio.fixture
-async def user(faker: Faker, password: str, async_session: AsyncSession) -> User:
-    email = faker.unique.email()
+async def user(session: AsyncSession, faker: Faker, password: str) -> User:
 
+    email = faker.unique.email()
     hasher = get_hasher()
 
     passowrd = hasher.hash(password)
     user = User(email=email, password_hash=passowrd)
 
-    async_session.add(user)
+    session.add(user)
 
-    await async_session.commit()
-    await async_session.refresh(user)
+    await session.commit()
+    await session.refresh(user)
 
     return user

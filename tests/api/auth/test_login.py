@@ -2,7 +2,7 @@ import pytest
 from faker import Faker
 from httpx import AsyncClient
 
-from app.db.models.user._user import User
+from app.db.models import User
 
 pytestmark = [
     pytest.mark.api,
@@ -11,11 +11,11 @@ pytestmark = [
 
 
 @pytest.mark.login
-async def test_login_email_not_found(async_client: AsyncClient, faker: Faker) -> None:
+async def test_login_email_not_found(client: AsyncClient, faker: Faker) -> None:
     email = faker.unique.email()
     password = faker.password()
 
-    response = await async_client.post(
+    response = await client.post(
         "/api/v1/auth/login",
         json={"email": email, "password": password},
     )
@@ -24,8 +24,8 @@ async def test_login_email_not_found(async_client: AsyncClient, faker: Faker) ->
 
 
 @pytest.mark.login
-async def test_login_invalid_password(async_client: AsyncClient, user: User) -> None:
-    response = await async_client.post(
+async def test_login_invalid_password(client: AsyncClient, user: User) -> None:
+    response = await client.post(
         "/api/v1/auth/login",
         json={"email": user.email, "password": "wrong-password"},
     )
@@ -34,10 +34,8 @@ async def test_login_invalid_password(async_client: AsyncClient, user: User) -> 
 
 
 @pytest.mark.login
-async def test_login_success(
-    async_client: AsyncClient, user: User, password: str
-) -> None:
-    response = await async_client.post(
+async def test_login_success(client: AsyncClient, user: User, password: str) -> None:
+    response = await client.post(
         "/api/v1/auth/login",
         json={"email": user.email, "password": password},
     )
