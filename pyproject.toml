@@ -96,10 +96,11 @@ markers = [
     "login: tests for user login endpoints and flows",
     "refresh: tests for token refresh endpoints and flows",
     "logout: tests for user logout endpoints and flows",
-    "me: tests for authencated user endpoints and flows",
+    "me: tests for authenticated user endpoints and flows",
     "integration: tests exercising multiple real application components together",
-    "e2e: end-to-end tests covering complete business workflows across the system",
     "slow: tests expected to run noticeably longer than standard unit or API checks",
+    "e2e: end-to-end tests covering complete business workflows across the system",
+    "auth_workflow: end-to-end tests covering complete auth workflow",
 ]
 
 # =============================================================================
