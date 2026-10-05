@@ -6,10 +6,10 @@ from app.db.models.user._user import User
 pytestmark = [
     pytest.mark.api,
     pytest.mark.auth,
+    pytest.mark.refresh,
 ]
 
 
-@pytest.mark.refresh
 async def test_refresh_token_field_required(client: AsyncClient) -> None:
     response = await client.post(
         "/api/v1/auth/refresh",
@@ -19,7 +19,6 @@ async def test_refresh_token_field_required(client: AsyncClient) -> None:
     assert response.status_code == 422
 
 
-@pytest.mark.refresh
 async def test_invalid_refresh(client: AsyncClient) -> None:
     response = await client.post(
         "/api/v1/auth/refresh",
@@ -29,7 +28,6 @@ async def test_invalid_refresh(client: AsyncClient) -> None:
     assert response.status_code == 400
 
 
-@pytest.mark.refresh
 async def test_refresh_success(client: AsyncClient, user: User, password: str) -> None:
 
     login_response = await client.post(

@@ -7,10 +7,10 @@ from app.db.models.user import User
 pytestmark = [
     pytest.mark.api,
     pytest.mark.auth,
+    pytest.mark.register,
 ]
 
 
-@pytest.mark.register
 async def test_register_password_missmatch(client: AsyncClient, faker: Faker) -> None:
     email = faker.unique.email()
     password = faker.password()
@@ -27,7 +27,6 @@ async def test_register_password_missmatch(client: AsyncClient, faker: Faker) ->
     assert response.status_code == 400
 
 
-@pytest.mark.register
 async def test_register_success(client: AsyncClient, faker: Faker) -> None:
     email = faker.unique.email()
     password = faker.password()
@@ -44,7 +43,6 @@ async def test_register_success(client: AsyncClient, faker: Faker) -> None:
     assert response.status_code == 200
 
 
-@pytest.mark.register
 async def test_register_email_exists(client: AsyncClient, user: User) -> None:
     response = await client.post(
         "/api/v1/auth/register",

@@ -7,10 +7,10 @@ from app.db.models import User
 pytestmark = [
     pytest.mark.api,
     pytest.mark.auth,
+    pytest.mark.login,
 ]
 
 
-@pytest.mark.login
 async def test_login_email_not_found(client: AsyncClient, faker: Faker) -> None:
     email = faker.unique.email()
     password = faker.password()
@@ -23,7 +23,6 @@ async def test_login_email_not_found(client: AsyncClient, faker: Faker) -> None:
     assert response.status_code == 404
 
 
-@pytest.mark.login
 async def test_login_invalid_password(client: AsyncClient, user: User) -> None:
     response = await client.post(
         "/api/v1/auth/login",
@@ -33,7 +32,6 @@ async def test_login_invalid_password(client: AsyncClient, user: User) -> None:
     assert response.status_code == 400
 
 
-@pytest.mark.login
 async def test_login_success(client: AsyncClient, user: User, password: str) -> None:
     response = await client.post(
         "/api/v1/auth/login",
