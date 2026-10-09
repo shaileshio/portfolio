@@ -40,6 +40,7 @@
   "files.exclude": {
     "**/.venv": true,
     "**/.git": true,
+    "**/.fastapicloud": true,
     "**/.DS_Store": true,
     "**/__pycache__": true,
     "**/.ruff_cache": true,
