@@ -18,6 +18,7 @@ from app.shared.request import (
     get_ip_address,
     get_user_agent,
 )
+from app.shared.schemas import DetailResponse
 
 from .errors import (
     ConfirmPasswordNotMatchError,
@@ -28,7 +29,7 @@ from .errors import (
     TokenRevokedError,
     UserNotFoundError,
 )
-from .schemas import LogoutResponse, TokenResponse
+from .schemas import TokenResponse
 
 settings = get_settings()
 
@@ -190,7 +191,7 @@ class AuthService:
 
         return TokenResponse(access_token=access_token, refresh_token=refresh_token)
 
-    async def logout(self, request: Request, refresh_token: str) -> LogoutResponse:
+    async def logout(self, request: Request, refresh_token: str) -> DetailResponse:
 
         claims = self._token_manager.verify(refresh_token)
 
@@ -224,4 +225,4 @@ class AuthService:
 
             await self._session.commit()
 
-        return LogoutResponse(detail="Logout successful")
+        return DetailResponse(detail="Logout successful")

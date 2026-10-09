@@ -1,38 +1,31 @@
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, EmailStr
+from pydantic import BaseModel, EmailStr
+
+from app.db.base import BaseOrmModel
 
 
-class RegisterRequest(BaseModel):
+class UserRegister(BaseModel):
     email: EmailStr
     password: str
     confirm_password: str
 
 
-class RegisterResponse(BaseModel):
+class UserResponse(BaseOrmModel):
     id: UUID
     email: EmailStr
 
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
 
-
-class UserResponse(BaseModel):
-    id: UUID
-    email: EmailStr
-
-    model_config = ConfigDict(
-        from_attributes=True,
-    )
-
-
-class LoginRequest(BaseModel):
+class UserLogin(BaseModel):
     email: EmailStr
     password: str
 
 
-class RefreshRequest(BaseModel):
+class UserLogout(BaseModel):
+    refresh_token: str
+
+
+class TokenRefresh(BaseModel):
     refresh_token: str
 
 
@@ -40,11 +33,3 @@ class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
     token_type: str = "Bearer"
-
-
-class LogoutRequest(BaseModel):
-    refresh_token: str
-
-
-class LogoutResponse(BaseModel):
-    detail: str

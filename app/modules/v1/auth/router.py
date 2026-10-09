@@ -1,17 +1,16 @@
 from fastapi import APIRouter, Request
 
 from app.db.models.user import User
-from app.modules.v1.auth.schemas import LogoutResponse
 from app.shared.depends import CurrentUserDep
+from app.shared.schemas import DetailResponse
 
 from .depends import AuthServiceDep
 from .schemas import (
-    LoginRequest,
-    LogoutRequest,
-    RefreshRequest,
-    RegisterRequest,
-    RegisterResponse,
+    TokenRefresh,
     TokenResponse,
+    UserLogin,
+    UserLogout,
+    UserRegister,
     UserResponse,
 )
 
@@ -22,9 +21,9 @@ router = APIRouter(prefix="/auth", tags=["Authencation"])
     "/register",
     summary="Create a new user account",
     description="Register a new user account for authentication.",
-    response_model=RegisterResponse,
+    response_model=UserResponse,
 )
-async def register(data: RegisterRequest, service: AuthServiceDep) -> User:
+async def register(data: UserRegister, service: AuthServiceDep) -> User:
     return await service.create_active_user(
         data.email, data.password, data.confirm_password
     )
@@ -36,7 +35,7 @@ async def register(data: RegisterRequest, service: AuthServiceDep) -> User:
     description="Issue new jwt tokens to make requests on protected routes.",
 )
 async def login(
-    request: Request, data: LoginRequest, service: AuthServiceDep
+    request: Request, data: UserLogin, service: AuthServiceDep
 ) -> TokenResponse:
     return await service.create_jwt_tokens(request, data.email, data.password)
 
@@ -47,7 +46,7 @@ async def login(
     description="Issue a new access token using a valid refresh token.",
 )
 async def refresh(
-    request: Request, data: RefreshRequest, service: AuthServiceDep
+    request: Request, data: TokenRefresh, service: AuthServiceDep
 ) -> TokenResponse:
     return await service.rotate_refresh_token(request, data.refresh_token)
 
@@ -58,8 +57,8 @@ async def refresh(
     description="Log out by invalidating the current authentication session.",
 )
 async def logout(
-    request: Request, data: LogoutRequest, service: AuthServiceDep
-) -> LogoutResponse:
+    request: Request, data: UserLogout, service: AuthServiceDep
+) -> DetailResponse:
     return await service.logout(request, data.refresh_token)
 
 
