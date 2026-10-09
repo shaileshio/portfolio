@@ -1,7 +1,7 @@
 [project]
-name = "portfolio-builder"
 version = "0.1.0"
-description = "Production-grade AI-powered engineering portfolio builder"
+name = "portfolio"
+description = "Software Engineering Portfolio"
 readme = "README.md"
 requires-python = ">=3.14"
 dependencies = [
