@@ -465,18 +465,6 @@ wheels = [
 ]
 
 [[package]]
-name = "fastapi-swagger-ui-theme"
-version = "0.1.0"
-source = { registry = "https://pypi.org/simple" }
-dependencies = [
-    { name = "fastapi" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/b8/fe/f399e6738aff9f110444b8dbfea26eb378b1e1e9b12113db510d64e170b9/fastapi_swagger_ui_theme-0.1.0.tar.gz", hash = "sha256:0c1dfbdb83d1a189a2fca795f077e2f4789f259cf9c229e7e71d656c53d1fea5", size = 36300, upload-time = "2026-02-03T12:06:51.929Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/96/6b/708d64b24a34c8b734c1cd720035270b0708af997f2d1f01cf4806427af0/fastapi_swagger_ui_theme-0.1.0-py3-none-any.whl", hash = "sha256:30252d6473a04f0a8ac360a2b382aab90828e597083010e686ba7fa84a0d73c0", size = 37027, upload-time = "2026-02-03T12:06:50.575Z" },
-]
-
-[[package]]
 name = "fastar"
 version = "0.12.0"
 source = { registry = "https://pypi.org/simple" }
@@ -767,7 +755,6 @@ dependencies = [
     { name = "asyncpg" },
     { name = "cryptography" },
     { name = "fastapi", extra = ["standard"] },
-    { name = "fastapi-swagger-ui-theme" },
     { name = "pydantic-settings" },
     { name = "python-jose", extra = ["cryptography"] },
     { name = "sqlalchemy" },
@@ -777,7 +764,6 @@ dependencies = [
 
 [package.dev-dependencies]
 dev = [
-    { name = "fastapi-swagger-ui-theme" },
     { name = "httpx" },
     { name = "pytest" },
     { name = "pytest-asyncio" },
@@ -793,7 +779,6 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.31.0" },
     { name = "cryptography", specifier = ">=50.0.1" },
     { name = "fastapi", extras = ["standard"], specifier = ">=0.141.1" },
-    { name = "fastapi-swagger-ui-theme", specifier = ">=0.1.0" },
     { name = "pydantic-settings", specifier = ">=2.15.0" },
     { name = "python-jose", extras = ["cryptography"], specifier = ">=3.5.0" },
     { name = "sqlalchemy", specifier = ">=2.0.52" },
@@ -803,7 +788,6 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [
-    { name = "fastapi-swagger-ui-theme", specifier = ">=0.1.0" },
     { name = "httpx", specifier = ">=0.28.1" },
     { name = "pytest", specifier = ">=9.1.1" },
     { name = "pytest-asyncio", specifier = ">=1.4.0" },
