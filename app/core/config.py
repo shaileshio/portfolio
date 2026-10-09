@@ -7,8 +7,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AppConfig(BaseModel):
-    title: str = "Portfolio Builder"
-    description: str = "Production-grade AI-powered engineering portfolio builder"
+    title: str = "Portfolio"
+    description: str = "Software Engineering Portfolio"
     env: Literal["test", "development", "production"] = "production"
 
 
