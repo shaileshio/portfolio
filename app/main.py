@@ -4,6 +4,7 @@ from app.core.config import get_settings
 from app.core.exceptions.handlers import setup_error_handlers
 from app.core.logging import configure_logging
 from app.core.middlewares import setup_middlewares
+from app.core.setup_get_api_info import setup_get_api_info
 from app.modules.router import router
 
 configure_logging()
@@ -27,6 +28,7 @@ def create_app() -> FastAPI:
 
     setup_error_handlers(app)
     setup_middlewares(app)
+    setup_get_api_info(app)
 
     app.include_router(router)
 
