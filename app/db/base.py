@@ -28,7 +28,7 @@ class Base(DeclarativeBase):
         super().__init_subclass__(**kwargs)
 
 
-class BaseModel(Model):
+class BaseOrmModel(Model):
     model_config = ConfigDict(
         from_attributes=True,
     )

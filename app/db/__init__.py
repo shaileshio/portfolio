@@ -1,4 +1,4 @@
-from .base import Base, BaseModel
+from .base import Base, BaseOrmModel
 from .models import *
 
-__all__: list[str] = ["Base", "BaseModel"]
+__all__: list[str] = ["Base", "BaseOrmModel"]
