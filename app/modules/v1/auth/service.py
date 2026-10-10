@@ -10,6 +10,7 @@ from app.core.security.hashing import get_hasher
 from app.core.security.tokens.enum import TokenType
 from app.core.security.tokens.provider import get_token_manager
 from app.db.models import User
+from app.db.models.user.session import UserSession
 from app.db.repositories import UserRepository
 from app.db.repositories.user_session import UserSessionRepository
 from app.shared.datetime import get_utc_now
@@ -226,3 +227,8 @@ class AuthService:
             await self._session.commit()
 
         return DetailResponse(detail="Logout successful")
+
+    async def list_active_sessions(self, user_id: UUID) -> list[UserSession]:
+        return await self._user_session_repo.list_active_sessions(
+            user_id,
+        )

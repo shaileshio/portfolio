@@ -45,18 +45,14 @@ class UserSessionRepository:
             UserSession.id == session_id,
         )
 
-        result = await self._session.execute(stmt)
-
-        return result.scalar_one_or_none()
+        return (await self._session.scalars(stmt)).one_or_none()
 
     async def get_by_user_id(self, user_id: UUID) -> UserSession | None:
         stmt = select(UserSession).where(
             UserSession.user_id == user_id,
         )
 
-        result = await self._session.execute(stmt)
-
-        return result.scalar_one_or_none()
+        return (await self._session.scalars(stmt)).one_or_none()
 
     async def get_by_ids(self, user_id: UUID, session_id: UUID) -> UserSession | None:
         stmt = select(UserSession).where(
@@ -64,16 +60,11 @@ class UserSessionRepository:
             UserSession.id == session_id,
         )
 
-        result = await self._session.execute(stmt)
+        return (await self._session.scalars(stmt)).one_or_none()
 
-        return result.scalar_one_or_none()
-
-    async def list_active_sessions(
-        self, user_id: UUID, session_id: UUID
-    ) -> list[UserSession]:
+    async def list_active_sessions(self, user_id: UUID) -> list[UserSession]:
         stmt = select(UserSession).where(
             UserSession.user_id == user_id,
-            UserSession.id == session_id,
         )
 
         sesstions = (await self._session.scalars(stmt)).all()

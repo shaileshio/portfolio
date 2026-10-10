@@ -12,5 +12,5 @@ class InvalidTokenError(TokenError):
 
 
 class ExpiredTokenSignatureError(TokenError):
-    def __init__(self, detail: str = "Token signature expire") -> None:
+    def __init__(self, detail: str = "Invalid token signature") -> None:
         super().__init__(detail)

@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request
 
 from app.db.models.user import User
 from app.shared.depends import CurrentUserDep
-from app.shared.schemas import DetailResponse
+from app.shared.schemas import DetailResponse, Meta, Response
 
 from .depends import AuthServiceDep
 from .schemas import (
@@ -12,6 +12,7 @@ from .schemas import (
     UserLogout,
     UserRegister,
     UserResponse,
+    UserSessionResponse,
 )
 
 router = APIRouter(prefix="/auth", tags=["Authencation"])
@@ -70,3 +71,23 @@ async def logout(
 )
 async def get_me(request: Request, user: CurrentUserDep) -> User:
     return user
+
+
+@router.get(
+    "/sessions",
+    summary="List active user sessions",
+    description="Retrieve all active authentication sessions for the current user.",
+)
+async def list_sessions(
+    user: CurrentUserDep, service: AuthServiceDep
+) -> Response[list[UserSessionResponse]]:
+    sessions = await service.list_active_sessions(user.id)
+
+    session_responses = [
+        UserSessionResponse.model_validate(session) for session in sessions
+    ]
+
+    return Response(
+        data=session_responses,
+        meta=Meta(),
+    )

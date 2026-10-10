@@ -1,3 +1,4 @@
+from datetime import datetime
 from uuid import UUID
 
 from pydantic import BaseModel, EmailStr
@@ -32,4 +33,12 @@ class TokenRefresh(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     refresh_token: str
-    token_type: str = "Bearer"
+    token_type: str = "bearer"
+
+
+class UserSessionResponse(BaseOrmModel):
+    id: UUID
+    session_expires_at: datetime
+    last_seen_at: datetime | None
+    user_agent: str | None
+    created_at: datetime
