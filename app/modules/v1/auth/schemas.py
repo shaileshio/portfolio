@@ -15,6 +15,9 @@ class UserRegister(BaseModel):
 class UserResponse(BaseOrmModel):
     id: UUID
     email: EmailStr
+    is_active: bool
+    is_verified: bool
+    updated_at: datetime
 
 
 class UserLogin(BaseModel):
