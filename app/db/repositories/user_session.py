@@ -68,7 +68,7 @@ class UserSessionRepository:
 
         return result.scalar_one_or_none()
 
-    async def list_active_session(
+    async def list_active_sessions(
         self, user_id: UUID, session_id: UUID
     ) -> list[UserSession]:
         stmt = select(UserSession).where(
