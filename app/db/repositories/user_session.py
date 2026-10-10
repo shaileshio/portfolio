@@ -67,3 +67,15 @@ class UserSessionRepository:
         result = await self._session.execute(stmt)
 
         return result.scalar_one_or_none()
+
+    async def list_active_session(
+        self, user_id: UUID, session_id: UUID
+    ) -> list[UserSession]:
+        stmt = select(UserSession).where(
+            UserSession.user_id == user_id,
+            UserSession.id == session_id,
+        )
+
+        sesstions = (await self._session.scalars(stmt)).all()
+
+        return list(filter(lambda session: session.is_active(), sesstions))
