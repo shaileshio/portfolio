@@ -7,10 +7,9 @@ from sqlalchemy.ext.asyncio import (
     create_async_engine,
 )
 
-from app.core.config import Settings, get_settings
+from app.core.config import get_settings
 
-settings: Settings = get_settings()
-
+settings = get_settings()
 
 DATABASE_URL = settings.database.get_url()
 
