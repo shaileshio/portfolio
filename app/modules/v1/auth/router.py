@@ -1,4 +1,5 @@
 from typing import cast
+from uuid import UUID
 
 from fastapi import APIRouter, Request
 
@@ -88,3 +89,16 @@ async def list_sessions(
     return UserSessionListResponse(
         sessions=cast(list[UserSessionResponse], sessions),
     )
+
+
+@router.get(
+    "/sessions/{session_id}",
+    summary="get active user session",
+    description="Retrieve a single active authentication session for the current user.",
+)
+async def get_session(
+    user: CurrentUserDep, session_id: UUID, service: AuthServiceDep
+) -> UserSessionResponse:
+    session = await service.get_active_session(user.id, session_id)
+
+    return cast(UserSessionResponse, session)

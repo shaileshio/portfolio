@@ -83,7 +83,7 @@ class AuthService:
         utc_now = get_utc_now()
         subject = str(user.id)
 
-        access_expires_at = utc_now + timedelta(minutes=access_token_lifetime)
+        access_expires_at = utc_now + timedelta(minutes=access_token_lifetime)  # type: ignore
         refresh_expires_at = utc_now + timedelta(minutes=refresh_token_lifetime)
 
         session = await self._user_session_repo.create(
@@ -156,7 +156,7 @@ class AuthService:
         utc_now = get_utc_now()
 
         refresh_expires_at = utc_now + timedelta(minutes=refresh_token_lifetime)
-        access_expires_at = utc_now + timedelta(minutes=access_token_lifetime)
+        access_expires_at = utc_now + timedelta(minutes=access_token_lifetime)  # type: ignore
 
         if session.is_refresh_expired():
             refresh_token = self._token_manager.create(
@@ -232,3 +232,8 @@ class AuthService:
         return await self._user_session_repo.list_active_sessions(
             user_id,
         )
+
+    async def get_active_session(
+        self, user_id: UUID, session_id: UUID
+    ) -> UserSession | None:
+        return await self._user_session_repo.get_by_ids(user_id, session_id)
