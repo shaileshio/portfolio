@@ -1,8 +1,10 @@
+from typing import cast
+
 from fastapi import APIRouter, Request
 
 from app.db.models.user import User
 from app.shared.depends import CurrentUserDep
-from app.shared.schemas import DetailResponse, Meta, Response
+from app.shared.schemas import DetailResponse
 
 from .depends import AuthServiceDep
 from .schemas import (
@@ -12,6 +14,7 @@ from .schemas import (
     UserLogout,
     UserRegister,
     UserResponse,
+    UserSessionListResponse,
     UserSessionResponse,
 )
 
@@ -67,10 +70,9 @@ async def logout(
     "/me",
     summary="Get current authenticated user",
     description="Return the authenticated user's profile information for the current session.",
-    response_model=UserResponse,
 )
-async def get_me(request: Request, user: CurrentUserDep) -> User:
-    return user
+async def get_me(request: Request, user: CurrentUserDep) -> UserResponse:
+    return cast(UserResponse, user)
 
 
 @router.get(
@@ -80,14 +82,9 @@ async def get_me(request: Request, user: CurrentUserDep) -> User:
 )
 async def list_sessions(
     user: CurrentUserDep, service: AuthServiceDep
-) -> Response[list[UserSessionResponse]]:
+) -> UserSessionListResponse:
     sessions = await service.list_active_sessions(user.id)
 
-    session_responses = [
-        UserSessionResponse.model_validate(session) for session in sessions
-    ]
-
-    return Response(
-        data=session_responses,
-        meta=Meta(),
+    return UserSessionListResponse(
+        sessions=cast(list[UserSessionResponse], sessions),
     )
