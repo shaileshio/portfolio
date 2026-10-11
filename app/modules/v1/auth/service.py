@@ -29,6 +29,7 @@ from .errors import (
     SessionExpiredError,
     TokenRevokedError,
     UserNotFoundError,
+    UserSessionNotFoundError,
 )
 from .schemas import TokenResponse
 
@@ -233,7 +234,10 @@ class AuthService:
             user_id,
         )
 
-    async def get_active_session(
-        self, user_id: UUID, session_id: UUID
-    ) -> UserSession | None:
-        return await self._user_session_repo.get_by_ids(user_id, session_id)
+    async def get_active_session(self, user_id: UUID, session_id: UUID) -> UserSession:
+        session = await self._user_session_repo.get_by_ids(user_id, session_id)
+
+        if not session:
+            raise UserSessionNotFoundError
+
+        return session
