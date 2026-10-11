@@ -258,6 +258,37 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Get Session",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{access_token}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/api/v1/auth/sessions/01a0f860-e0e4-7066-8f39-44a265bd6966",
+              "host": [
+                "{{base_url}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "auth",
+                "sessions",
+                "01a0f860-e0e4-7066-8f39-44a265bd6966"
+              ]
+            }
+          },
+          "response": []
         }
       ]
     }
