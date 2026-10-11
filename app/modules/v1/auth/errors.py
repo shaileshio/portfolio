@@ -50,7 +50,7 @@ class EmailAlreadyExistError(ConflictError):
 class UserSessionNotFoundError(NotFoundError):
     def __init__(
         self,
-        detail: str = "User session does't exist",
+        detail: str = "User session not found",
         *,
         code: str = "user_not_found",
         status: int = status.HTTP_404_NOT_FOUND,
