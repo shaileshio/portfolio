@@ -10,16 +10,15 @@ pytestmark = [
 ]
 
 
-async def test_logout_field_required(client: AsyncClient) -> None:
-    response = await client.post(
-        "/api/v1/auth/logout",
-        json={},
-    )
+async def test_logout_returns_422_when_required_fields_missing(
+    client: AsyncClient,
+) -> None:
+    response = await client.post("/api/v1/auth/logout", json={})
 
     assert response.status_code == 422
 
 
-async def test_logout_invalid_token(client: AsyncClient) -> None:
+async def test_logout_returns_400_when_token_is_not_valid(client: AsyncClient) -> None:
     response = await client.post(
         "/api/v1/auth/logout",
         json={"refresh_token": "invalid-refresh-token"},
@@ -28,17 +27,19 @@ async def test_logout_invalid_token(client: AsyncClient) -> None:
     assert response.status_code == 400
 
 
-async def test_logout_success(client: AsyncClient, user: User, password: str) -> None:
-
+async def test_logout_success(
+    client: AsyncClient, created_user: User, password: str
+) -> None:
     login_response = await client.post(
         "/api/v1/auth/login",
-        json={"email": user.email, "password": password},
+        json={"email": created_user.email, "password": password},
     )
 
-    logout_response = await client.post(
+    assert login_response.status_code == 200
+
+    response = await client.post(
         "/api/v1/auth/logout",
         json={"refresh_token": login_response.json()["refresh_token"]},
     )
 
-    assert login_response.status_code == 200
-    assert logout_response.status_code == 200
+    assert response.status_code == 200

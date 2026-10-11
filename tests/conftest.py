@@ -15,11 +15,16 @@ from app.db.session import get_async_session
 from app.main import app
 from app.shared.depends import get_current_user
 
-from .fixtures import *
-
 settings = get_settings()
 
 TEST_DATABASE_URL = settings.database.get_test_url()
+
+
+pytest_plugins = (
+    "tests.fixtures.users",
+    "tests.fixtures.auth",
+)
+
 
 type AsyncSessionGenerator = AsyncGenerator[AsyncSession]
 
@@ -68,7 +73,7 @@ async def client(
     async def override_get_session() -> AsyncSessionGenerator:
         yield session
 
-    def override_mock_current_user() -> User:
+    async def override_mock_current_user() -> User:
         return mock_current_user
 
     app.dependency_overrides[get_async_session] = override_get_session

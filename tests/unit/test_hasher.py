@@ -8,14 +8,14 @@ pytestmark = [
 ]
 
 
-def test_hash_success() -> None:
+def test_hash_and_verify_success() -> None:
     hasher = get_hasher()
 
     value = hasher.hash("shailesh")
     assert hasher.verify("shailesh", value)
 
 
-def test_hash_failed() -> None:
+def test_hash_failed_when_verify_with_invalid_value() -> None:
     hasher = get_hasher()
 
     value = hasher.hash("john")
