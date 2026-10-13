@@ -115,7 +115,6 @@
   // ==========================================
   // Ruff
   // ==========================================
-  "ruff.nativeServer": "on",
   "ruff.organizeImports": true,
   "ruff.fixAll": true,
 
@@ -158,6 +157,9 @@
     "jsonc": true
   },
   "[jsonc]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[dockercompose]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
