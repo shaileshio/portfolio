@@ -11,7 +11,7 @@ from app.db.depends import AsyncSessionDep
 from app.db.models.user._user import User
 from app.db.repositories.user import UserRepository
 from app.db.repositories.user_session import UserSessionRepository
-from app.modules.v1.auth.errors import InvalidTokenError
+from app.modules.v1.auth.errors import InvalidTokenError, TokenRevokedError
 
 type OAuth2PasswordBearerDep = Annotated[
     str,
@@ -50,6 +50,9 @@ async def get_current_user(
 
     if claims["type"] != TokenType.ACCESS.value or not user_session:
         raise InvalidTokenError
+
+    if not user_session.is_active():
+        raise TokenRevokedError
 
     return user
 
