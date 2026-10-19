@@ -3,7 +3,9 @@
 *.egg-info
 *.venv
 *.git
-*.env
+.env
+.env.*
+!.env.example
 *.fastapicloud
 *pycache*/
 db.sqlite

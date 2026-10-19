@@ -9,7 +9,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class AppConfig(BaseModel):
     title: str = "Portfolio"
     description: str = "Software Engineering Portfolio"
-    env: Literal["test", "development", "production"] = "production"
+    env: Literal["testing", "development", "production"] = "production"
 
 
 class CorsConfig(BaseModel):
